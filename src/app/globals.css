@@ -2,25 +2,116 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0d0d0d;
+  --surface: #ffffff;
+  --surface-subtle: #fafafa;
+  --muted: #666666;
+  --muted-strong: #333333;
+  --border: rgba(13, 13, 13, 0.05);
+  --border-strong: rgba(13, 13, 13, 0.08);
+  --brand: #18e299;
+  --brand-deep: #0fa76e;
+  --brand-light: #d4fae8;
+  --shadow-soft: 0 2px 4px rgba(13, 13, 13, 0.03);
+  --shadow-button: 0 1px 2px rgba(13, 13, 13, 0.06);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top, rgba(24, 226, 153, 0.16), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 34%, #fcfffe 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(24, 226, 153, 0.24);
+  color: var(--foreground);
+}
+
+.display-title {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+}
+
+.mono-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.page-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(24, 226, 153, 0.17), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), #ffffff 20%, #ffffff 100%);
+}
+
+.hero-atmosphere {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: -10% -12% auto;
+  height: 36rem;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(24, 226, 153, 0.26), transparent 30%),
+    radial-gradient(circle at 28% 18%, rgba(212, 250, 232, 0.9), transparent 34%),
+    radial-gradient(circle at 72% 22%, rgba(212, 250, 232, 0.9), transparent 32%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.hero-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.95) 70%),
+    linear-gradient(90deg, rgba(13, 13, 13, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(13, 13, 13, 0.02) 1px, transparent 1px);
+  background-size: auto, 64px 64px, 64px 64px;
+  pointer-events: none;
+}
+
+.surface-card {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-panel {
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9)),
+    #ffffff;
+  box-shadow: var(--shadow-soft);
 }
