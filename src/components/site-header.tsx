@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const links = [
   { href: "#overview", label: "Overview" },
@@ -8,7 +9,25 @@ const links = [
   { href: "/design-system", label: "Design System" },
 ];
 
-export function SiteHeader({ className }: { className?: string }) {
+type HeaderAction = {
+  href: string;
+  label: string;
+  variant?: "primary" | "secondary" | "ghost";
+};
+
+type SiteHeaderProps = {
+  className?: string;
+  navLinks?: typeof links;
+  primaryAction?: HeaderAction;
+  secondaryAction?: HeaderAction;
+};
+
+export function SiteHeader({
+  className,
+  navLinks = links.slice(0, 2),
+  primaryAction = { href: "/register", label: "Daftar" },
+  secondaryAction = { href: "/login", label: "Masuk", variant: "secondary" },
+}: SiteHeaderProps) {
   return (
     <header
       className={cn(
@@ -27,7 +46,7 @@ export function SiteHeader({ className }: { className?: string }) {
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          {links.slice(0, 2).map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.label}
               href={link.href}
@@ -38,12 +57,19 @@ export function SiteHeader({ className }: { className?: string }) {
           ))}
         </nav>
 
-        <Link
-          href="#overview"
-          className="inline-flex min-h-10 items-center rounded-full border border-[rgba(13,13,13,0.08)] bg-white px-4 text-sm font-medium text-[#0d0d0d] shadow-[0_1px_2px_rgba(13,13,13,0.04)] transition-colors hover:border-[#18E299]/40 hover:text-[#0fa76e]"
-        >
-          Lihat Produk
-        </Link>
+        <div className="flex items-center gap-2">
+          {secondaryAction ? (
+            <Button asChild variant={secondaryAction.variant ?? "secondary"} size="sm">
+              <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
+            </Button>
+          ) : null}
+
+          {primaryAction ? (
+            <Button asChild size="sm">
+              <Link href={primaryAction.href}>{primaryAction.label}</Link>
+            </Button>
+          ) : null}
+        </div>
       </div>
     </header>
   );

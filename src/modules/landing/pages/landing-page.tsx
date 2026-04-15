@@ -32,16 +32,17 @@ export function LandingPage() {
                 </p>
 
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Link href="#overview">
-                    <Button size="lg">Lihat ringkasan<ArrowRight /></Button>
-                      
-                      
-                    </Link>
-                  <Link href="#roles">
-                  <Button variant="secondary" size="lg">
+                  <Link href="/register">
+                    <Button size="lg">
+                      Mulai sekarang
+                      <ArrowRight />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button variant="secondary" size="lg">
                       <Play className="size-4" />
-                      Jelajahi peran
-                  </Button>
+                      Masuk ke akun
+                    </Button>
                   </Link>
                 </div>
 
@@ -164,10 +165,9 @@ export function LandingPage() {
                 </h2>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                
-                <Link href="#roles"><Button >Mulai lihat flow
-                  
-                </Button></Link>
+                <Link href="/register">
+                  <Button>Daftar sekarang</Button>
+                </Link>
                 <Button asChild variant="ghost">
                   <Link href="/design-system">Design system</Link>
                 </Button>
