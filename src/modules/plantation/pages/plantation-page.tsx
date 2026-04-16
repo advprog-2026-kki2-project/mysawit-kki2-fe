@@ -12,7 +12,7 @@ export function PlantationPage() {
         ]}
       />
 
-      <main className="hero-atmosphere">
+      <main>
         <section className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-18">
           <div className="space-y-6">
             <div className="max-w-2xl">
