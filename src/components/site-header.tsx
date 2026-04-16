@@ -94,9 +94,6 @@ export function SiteHeader({
           {activeSession ? (
             <>
               <div className="hidden rounded-full border border-[rgba(13,13,13,0.06)] bg-white px-4 py-2 text-right md:block">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#888888]">
-                  Sesi aktif
-                </p>
                 <p className="text-sm font-medium text-[#0d0d0d]">
                   {activeSession.username} · {roleLabels[activeSession.role]}
                 </p>

@@ -16,13 +16,37 @@ import {
   workflowSteps,
 } from "../data/content";
 
+function getRoleRoute(role: string) {
+  if (role === "ADMIN") {
+    return "/plantations";
+  }
+
+  if (role === "LABORER") {
+    return "/harvest";
+  }
+
+  return null;
+}
+
 export function LandingPage() {
   const { session, isLoading } = useAuthSession();
   const sessionRoleLabel = session ? roleLabels[session.role] : null;
+  const roleRoute = session ? getRoleRoute(session.role) : null;
+  const sessionNavLinks = session
+    ? [
+        { href: "#overview", label: "Overview" },
+        roleRoute
+          ? {
+              href: roleRoute,
+              label: session.role === "ADMIN" ? "Plantations" : "Panen",
+            }
+          : { href: "#roles", label: "Roles" },
+      ]
+    : undefined;
 
   return (
     <div className="page-shell bg-background text-foreground">
-      <SiteHeader />
+      <SiteHeader navLinks={sessionNavLinks} />
 
       <main>
         <section className="hero-atmosphere border-b border-[rgba(13,13,13,0.05)]">
@@ -44,9 +68,13 @@ export function LandingPage() {
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                   {session ? (
                     <>
-                      <Link href="#roles">
+                      <Link href={roleRoute ?? "#roles"}>
                         <Button size="lg">
-                          Lihat role kerja
+                          {session.role === "ADMIN"
+                            ? "Kelola plantation"
+                            : session.role === "LABORER"
+                              ? "Catat panen"
+                              : "Lihat role kerja"}
                           <ArrowRight />
                         </Button>
                       </Link>
@@ -205,8 +233,14 @@ export function LandingPage() {
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 {session ? (
-                  <Link href="/login">
-                    <Button variant="secondary">Kelola sesi</Button>
+                  <Link href={roleRoute ?? "/login"}>
+                    <Button variant="secondary">
+                      {session.role === "ADMIN"
+                        ? "Buka plantations"
+                        : session.role === "LABORER"
+                          ? "Buka form panen"
+                          : "Kelola sesi"}
+                    </Button>
                   </Link>
                 ) : (
                   <Link href="/register">

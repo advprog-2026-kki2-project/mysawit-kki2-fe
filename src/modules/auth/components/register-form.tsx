@@ -212,10 +212,6 @@ export function RegisterForm() {
               ))}
             </SelectContent>
           </Select>
-          <p className="text-sm leading-6 text-[#666666]">
-            Pendaftaran mandiri hanya tersedia untuk pekerja, mandor, dan
-            sopir. Akun admin disediakan oleh sistem.
-          </p>
         </div>
 
         <Button className="w-full" type="submit" disabled={isSubmitting}>
