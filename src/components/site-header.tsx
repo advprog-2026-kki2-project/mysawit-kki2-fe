@@ -1,7 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ApiError, logout } from "@/modules/auth/data/auth-api";
+import { roleLabels } from "@/modules/auth/data/types";
+import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
 
 const links = [
   { href: "#overview", label: "Overview" },
@@ -20,6 +28,7 @@ type SiteHeaderProps = {
   navLinks?: typeof links;
   primaryAction?: HeaderAction;
   secondaryAction?: HeaderAction;
+  showSessionActions?: boolean;
 };
 
 export function SiteHeader({
@@ -27,7 +36,29 @@ export function SiteHeader({
   navLinks = links.slice(0, 2),
   primaryAction = { href: "/register", label: "Daftar" },
   secondaryAction = { href: "/login", label: "Masuk", variant: "secondary" },
+  showSessionActions = true,
 }: SiteHeaderProps) {
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { session, refreshSession } = useAuthSession();
+  const activeSession = showSessionActions ? session : null;
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+      await refreshSession();
+      router.refresh();
+    } catch (error) {
+      if (!(error instanceof ApiError || error instanceof Error)) {
+        return;
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
   return (
     <header
       className={cn(
@@ -60,24 +91,49 @@ export function SiteHeader({
         </nav>
 
         <div className="flex items-center gap-2">
-          {secondaryAction ? (
-            <Link href={secondaryAction.href}>
+          {activeSession ? (
+            <>
+              <div className="hidden rounded-full border border-[rgba(13,13,13,0.06)] bg-white px-4 py-2 text-right md:block">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#888888]">
+                  Sesi aktif
+                </p>
+                <p className="text-sm font-medium text-[#0d0d0d]">
+                  {activeSession.username} · {roleLabels[activeSession.role]}
+                </p>
+              </div>
               <Button
-                variant={secondaryAction.variant ?? "secondary"}
+                type="button"
+                variant="secondary"
                 size="sm"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
               >
-                {secondaryAction.label}
+                <LogOut className="size-4" />
+                {isLoggingOut ? "Logout..." : "Logout"}
               </Button>
-            </Link>
-          ) : null}
+            </>
+          ) : (
+            <>
+              {secondaryAction ? (
+                <Link href={secondaryAction.href}>
+                  <Button
+                    variant={secondaryAction.variant ?? "secondary"}
+                    size="sm"
+                  >
+                    {secondaryAction.label}
+                  </Button>
+                </Link>
+              ) : null}
 
-          {primaryAction ? (
-            <Link href={primaryAction.href}>
-              <Button size="sm">
-                {primaryAction.label}
-              </Button>
-            </Link>
-          ) : null}
+              {primaryAction ? (
+                <Link href={primaryAction.href}>
+                  <Button size="sm">
+                    {primaryAction.label}
+                  </Button>
+                </Link>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
     </header>

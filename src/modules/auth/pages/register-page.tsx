@@ -6,7 +6,7 @@ export function RegisterPage() {
     <AuthShell
       badge="Register"
       title="Buat akun baru."
-      description="Isi data berikut untuk membuat akun dan lanjut ke login."
+      description="Pendaftaran mandiri tersedia untuk pekerja, mandor, dan sopir."
       alternateHref="/login"
       alternateLabel="Masuk"
       alternatePrompt="Sudah punya akun? Masuk dengan email dan password Anda."

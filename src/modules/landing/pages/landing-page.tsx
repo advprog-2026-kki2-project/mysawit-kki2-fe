@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Check, Play } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { roleLabels } from "@/modules/auth/data/types";
+import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
 
 import {
   featureCards,
@@ -13,6 +17,9 @@ import {
 } from "../data/content";
 
 export function LandingPage() {
+  const { session, isLoading } = useAuthSession();
+  const sessionRoleLabel = session ? roleLabels[session.role] : null;
+
   return (
     <div className="page-shell bg-background text-foreground">
       <SiteHeader />
@@ -27,22 +34,45 @@ export function LandingPage() {
                   Kelola panen, angkut, dan approval.
                 </h1>
                 <p className="mt-6 max-w-xl text-base leading-7 text-[#666666] sm:text-lg">
-                  Masuk atau buat akun untuk mulai bekerja.
+                  {isLoading
+                    ? "Memeriksa sesi akun Anda."
+                    : session
+                      ? `Anda masuk sebagai ${session.username} (${sessionRoleLabel}).`
+                      : "Masuk atau buat akun untuk mulai bekerja."}
                 </p>
 
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Link href="/register">
-                    <Button size="lg">
-                      Buat akun
-                      <ArrowRight />
-                    </Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button variant="secondary" size="lg">
-                      <Play className="size-4" />
-                      Masuk
-                    </Button>
-                  </Link>
+                  {session ? (
+                    <>
+                      <Link href="#roles">
+                        <Button size="lg">
+                          Lihat role kerja
+                          <ArrowRight />
+                        </Button>
+                      </Link>
+                      <Link href="#overview">
+                        <Button variant="secondary" size="lg">
+                          <Play className="size-4" />
+                          Lihat ringkasan
+                        </Button>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/register">
+                        <Button size="lg">
+                          Buat akun
+                          <ArrowRight />
+                        </Button>
+                      </Link>
+                      <Link href="/login">
+                        <Button variant="secondary" size="lg">
+                          <Play className="size-4" />
+                          Masuk
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-10 grid max-w-lg grid-cols-3 gap-3">
@@ -62,6 +92,17 @@ export function LandingPage() {
 
               <div className="surface-panel rounded-[2rem] p-4 sm:p-5">
                 <div className="grid gap-4">
+                  {session ? (
+                    <div className="rounded-[1.5rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] p-6 sm:p-7">
+                      <p className="mono-label text-[#0fa76e]">Sesi</p>
+                      <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+                        Akun Anda sudah terhubung ke backend.
+                      </h2>
+                      <p className="mt-3 max-w-md text-sm leading-7 text-[#666666]">
+                        Lanjutkan menggunakan role {sessionRoleLabel?.toLowerCase()}.
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] p-6 sm:p-7">
                     <p className="mono-label text-[#888888]">Workflow</p>
                     <div className="mt-5 grid gap-3">
@@ -163,9 +204,15 @@ export function LandingPage() {
                 </h2>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Link href="/register">
-                  <Button>Buat akun</Button>
-                </Link>
+                {session ? (
+                  <Link href="/login">
+                    <Button variant="secondary">Kelola sesi</Button>
+                  </Link>
+                ) : (
+                  <Link href="/register">
+                    <Button>Buat akun</Button>
+                  </Link>
+                )}
                 <Button asChild variant="ghost">
                   <Link href="/design-system">Design system</Link>
                 </Button>

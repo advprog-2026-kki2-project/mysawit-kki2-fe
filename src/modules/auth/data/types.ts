@@ -2,6 +2,19 @@ export const roleOptions = ["LABORER", "FOREMAN", "DRIVER", "ADMIN"] as const;
 
 export type Role = (typeof roleOptions)[number];
 
+export const selfRegistrationRoleOptions = [
+  "LABORER",
+  "FOREMAN",
+  "DRIVER",
+] as const satisfies readonly Role[];
+
+export const roleLabels: Record<Role, string> = {
+  LABORER: "Pekerja",
+  FOREMAN: "Mandor",
+  DRIVER: "Sopir",
+  ADMIN: "Admin",
+};
+
 export type AuthResponse = {
   message: string;
   username: string;

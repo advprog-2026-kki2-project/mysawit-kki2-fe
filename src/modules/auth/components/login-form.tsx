@@ -8,11 +8,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError, login, logout } from "@/modules/auth/data/auth-api";
+import { roleLabels } from "@/modules/auth/data/types";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
-
-function roleLabel(role: string) {
-  return role.charAt(0) + role.slice(1).toLowerCase();
-}
 
 export function LoginForm() {
   const router = useRouter();
@@ -104,7 +101,7 @@ export function LoginForm() {
 
         <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
           <p className="text-sm font-medium text-[#0d0d0d]">
-            Akun aktif: {session.username} ({roleLabel(session.role)})
+            Akun aktif: {session.username} ({roleLabels[session.role]})
           </p>
         </div>
 

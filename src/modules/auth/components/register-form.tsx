@@ -15,12 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ApiError, logout, register } from "@/modules/auth/data/auth-api";
-import { roleOptions, type Role } from "@/modules/auth/data/types";
+import {
+  roleLabels,
+  selfRegistrationRoleOptions,
+  type Role,
+} from "@/modules/auth/data/types";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
-
-function roleLabel(role: Role) {
-  return role.charAt(0) + role.slice(1).toLowerCase();
-}
 
 export function RegisterForm() {
   const router = useRouter();
@@ -110,7 +110,7 @@ export function RegisterForm() {
 
         <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
           <p className="text-sm font-medium text-[#0d0d0d]">
-            Akun aktif: {session.username} ({roleLabel(session.role)})
+            Akun aktif: {session.username} ({roleLabels[session.role]})
           </p>
         </div>
 
@@ -205,13 +205,17 @@ export function RegisterForm() {
               <SelectValue placeholder="Pilih role" />
             </SelectTrigger>
             <SelectContent>
-              {roleOptions.map((item) => (
+              {selfRegistrationRoleOptions.map((item) => (
                 <SelectItem key={item} value={item}>
-                  {roleLabel(item)}
+                  {roleLabels[item]}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          <p className="text-sm leading-6 text-[#666666]">
+            Pendaftaran mandiri hanya tersedia untuk pekerja, mandor, dan
+            sopir. Akun admin disediakan oleh sistem.
+          </p>
         </div>
 
         <Button className="w-full" type="submit" disabled={isSubmitting}>
