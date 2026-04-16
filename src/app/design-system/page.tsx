@@ -13,7 +13,7 @@ const componentSections = [
     title: "Buttons",
     label: "Call to action",
     description:
-      "Primary, secondary, and ghost actions all share the same pill silhouette and restrained motion from the design brief.",
+      "Use clear actions for primary, secondary, and optional steps.",
     content: (
       <div className="flex flex-wrap gap-4">
         <Button>Get Started</Button>
@@ -26,7 +26,7 @@ const componentSections = [
     title: "Badges",
     label: "Utility labels",
     description:
-      "Badges stay compact, mono-led, and lightly tinted so they support hierarchy without stealing focus.",
+      "Use badges for short status or category labels.",
     content: (
       <div className="flex flex-wrap gap-4">
         <Badge>Brand badge</Badge>
@@ -39,13 +39,13 @@ const componentSections = [
     title: "Inputs",
     label: "Forms",
     description:
-      "Form controls keep the white-canvas feel with subtle borders, rounded geometry, and green focus treatment.",
+      "Use short labels and placeholders that help users finish the form.",
     content: (
       <div className="grid gap-4 md:grid-cols-2">
         <Input placeholder="you@company.com" />
-        <Input placeholder="Documentation project" />
+        <Input placeholder="Project name" />
         <div className="md:col-span-2">
-          <Textarea placeholder="Describe the feature, flow, or documentation surface you want to build next." />
+          <Textarea placeholder="Add details" />
         </div>
       </div>
     ),
@@ -54,7 +54,7 @@ const componentSections = [
     title: "Separators",
     label: "Rhythm",
     description:
-      "Thin dividers help create structure and chapter breaks without introducing heavier backgrounds or strong shadows.",
+      "Use separators to group related content.",
     content: (
       <div className="space-y-5">
         <div className="flex items-center justify-between gap-4 text-sm text-[#333333]">
@@ -87,20 +87,18 @@ export default function DesignSystemPage() {
             className="mono-label inline-flex w-fit items-center gap-2 text-[#888888] transition-colors hover:text-[#18E299]"
           >
             <ArrowLeft className="size-4" />
-            Back to homepage
+            Back to home
           </Link>
 
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
             <div className="space-y-5">
               <Badge className="w-fit">Design system</Badge>
               <h1 className="display-title max-w-[10ch] text-[3rem] sm:text-[4.5rem] lg:text-[5.5rem]">
-                Shared components styled to match the new documentation theme.
+                Review shared components.
               </h1>
             </div>
             <p className="max-w-xl text-base leading-7 text-[#666666]">
-              This gallery reflects the same decisions used on the homepage:
-              Inter headlines, mono utility labels, white surfaces, subtle
-              borders, pill controls, and disciplined green accents.
+              Use this page to check shared UI patterns and form copy.
             </p>
           </div>
         </div>
@@ -134,11 +132,11 @@ export default function DesignSystemPage() {
             <div>
               <p className="mono-label text-[#888888]">Next step</p>
               <h2 className="display-title mt-4 max-w-[10ch] text-[2.4rem] sm:text-[3rem]">
-                Extend the system with the same restraint.
+                Return to the main pages.
               </h2>
             </div>
-            <Button >
-              Return to landing page
+            <Button asChild>
+              <Link href="/">Return to home</Link>
             </Button>
           </div>
         </section>

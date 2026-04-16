@@ -22,7 +22,12 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { session, isLoading, error: sessionError, refreshSession } = useAuthSession();
+  const {
+    session,
+    isLoading,
+    error: sessionError,
+    refreshSession,
+  } = useAuthSession();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,25 +95,26 @@ export function LoginForm() {
         <div>
           <p className="mono-label text-[#888888]">Sesi Aktif</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-            Kamu sudah masuk sebagai {session.username}.
+            Anda sudah masuk.
           </h2>
           <p className="mt-3 text-sm leading-7 text-[#666666]">
-            Role aktif saat ini adalah {roleLabel(session.role)}. Kamu bisa
-            kembali ke landing page atau logout untuk masuk dengan akun lain.
+            Logout jika Anda ingin masuk dengan akun lain.
           </p>
         </div>
 
         <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
-          <p className="text-sm font-medium text-[#0d0d0d]">{session.message}</p>
+          <p className="text-sm font-medium text-[#0d0d0d]">
+            Akun aktif: {session.username} ({roleLabel(session.role)})
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild>
-            <Link href="/">
-              Kembali ke beranda
+          <Link href="/">
+            <Button>
+              Kembali
               <ArrowRight className="size-4" />
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <Button
             type="button"
             variant="secondary"
@@ -134,11 +140,10 @@ export function LoginForm() {
       <div>
         <p className="mono-label text-[#888888]">Masuk</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Gunakan akun yang sudah terdaftar.
+          Masuk ke akun Anda.
         </h2>
         <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Frontend akan memanggil API backend dan menyimpan sesi login melalui
-          cookie session backend.
+          Masukkan email dan password Anda.
         </p>
       </div>
 
@@ -150,7 +155,7 @@ export function LoginForm() {
           <Input
             id="email"
             type="email"
-            placeholder="laborer@example.com"
+            placeholder="nama@perusahaan.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
@@ -158,7 +163,10 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="password">
+          <label
+            className="text-sm font-medium text-[#333333]"
+            htmlFor="password"
+          >
             Password
           </label>
           <Input
@@ -172,7 +180,7 @@ export function LoginForm() {
         </div>
 
         <Button className="w-full" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Memproses login..." : "Masuk"}
+          {isSubmitting ? "Memproses..." : "Masuk"}
         </Button>
       </form>
 
@@ -191,7 +199,7 @@ export function LoginForm() {
       <p className="text-sm leading-7 text-[#666666]">
         Belum punya akun?{" "}
         <Link className="font-medium text-[#0fa76e]" href="/register">
-          Daftar di frontend
+          Buat akun
         </Link>
         .
       </p>

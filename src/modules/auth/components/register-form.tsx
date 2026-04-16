@@ -99,25 +99,25 @@ export function RegisterForm() {
           <CheckCircle2 className="size-5" />
         </div>
         <div>
-          <p className="mono-label text-[#888888]">Akun Aktif</p>
+          <p className="mono-label text-[#888888]">Sesi Aktif</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-            Satu akun sudah sedang aktif.
+            Anda sudah masuk.
           </h2>
           <p className="mt-3 text-sm leading-7 text-[#666666]">
-            Saat ini kamu login sebagai {session.username} dengan role{" "}
-            {roleLabel(session.role)}. Logout dulu jika ingin membuat akun lain
-            dari sesi yang sama.
+            Logout jika Anda ingin membuat akun lain.
           </p>
         </div>
 
         <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
-          <p className="text-sm font-medium text-[#0d0d0d]">{session.message}</p>
+          <p className="text-sm font-medium text-[#0d0d0d]">
+            Akun aktif: {session.username} ({roleLabel(session.role)})
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild>
             <Link href="/">
-              Kembali ke beranda
+              Kembali
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -146,11 +146,10 @@ export function RegisterForm() {
       <div>
         <p className="mono-label text-[#888888]">Daftar</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Buat akun baru langsung dari frontend.
+          Buat akun.
         </h2>
         <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Form ini akan mengirim DTO registrasi ke backend melalui API auth yang
-          sama dengan test backend.
+          Semua field wajib diisi.
         </p>
       </div>
 
@@ -162,7 +161,7 @@ export function RegisterForm() {
           <Input
             id="register-email"
             type="email"
-            placeholder="nama@mysawit.com"
+            placeholder="nama@perusahaan.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
@@ -176,7 +175,7 @@ export function RegisterForm() {
           <Input
             id="username"
             type="text"
-            placeholder="operator01"
+            placeholder="mis. budi.sawit"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
             required
@@ -190,7 +189,7 @@ export function RegisterForm() {
           <Input
             id="register-password"
             type="password"
-            placeholder="Buat password"
+            placeholder="Masukkan password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
@@ -216,7 +215,7 @@ export function RegisterForm() {
         </div>
 
         <Button className="w-full" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Mendaftarkan akun..." : "Daftar akun"}
+          {isSubmitting ? "Membuat akun..." : "Buat akun"}
         </Button>
       </form>
 
@@ -235,7 +234,7 @@ export function RegisterForm() {
       <p className="text-sm leading-7 text-[#666666]">
         Sudah punya akun?{" "}
         <Link className="font-medium text-[#0fa76e]" href="/login">
-          Masuk sekarang
+          Masuk
         </Link>
         .
       </p>

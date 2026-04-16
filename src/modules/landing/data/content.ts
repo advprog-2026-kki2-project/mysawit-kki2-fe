@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 export const landingStats = [
-  { value: "4", label: "Role utama" },
-  { value: "1", label: "Platform terpadu" },
-  { value: "24/7", label: "Monitoring alur" },
+  { value: "4", label: "Role" },
+  { value: "1", label: "Alur kerja" },
+  { value: "24/7", label: "Status" },
 ];
 
 export const roleCards = [
@@ -39,18 +39,18 @@ export const roleCards = [
 export const featureCards = [
   {
     icon: Waves,
-    title: "Alur kerja lebih rapi",
-    body: "Panen, angkut, dan approval tersambung dalam satu flow visual.",
+    title: "Catat proses",
+    body: "Kelola panen, angkut, dan approval dalam satu alur.",
   },
   {
     icon: ShieldCheck,
-    title: "Akses sesuai peran",
-    body: "Setiap pengguna bekerja di area yang memang menjadi tanggung jawabnya.",
+    title: "Atur akses",
+    body: "Setiap pengguna bekerja sesuai role.",
   },
   {
     icon: Users,
-    title: "Koordinasi lebih jelas",
-    body: "Semua pihak melihat status yang sama tanpa pindah-pindah sistem.",
+    title: "Lihat status",
+    body: "Pantau progres kerja di satu tempat.",
   },
 ];
 

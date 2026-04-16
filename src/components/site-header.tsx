@@ -41,7 +41,9 @@ export function SiteHeader({
             M
           </span>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-[#0d0d0d]">Mysawit</span> 
+            <span className="text-sm font-semibold text-[#0d0d0d]">
+              Mysawit
+            </span>
           </div>
         </Link>
 
@@ -59,15 +61,22 @@ export function SiteHeader({
 
         <div className="flex items-center gap-2">
           {secondaryAction ? (
-            <Button asChild variant={secondaryAction.variant ?? "secondary"} size="sm">
-              <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
-            </Button>
+            <Link href={secondaryAction.href}>
+              <Button
+                variant={secondaryAction.variant ?? "secondary"}
+                size="sm"
+              >
+                {secondaryAction.label}
+              </Button>
+            </Link>
           ) : null}
 
           {primaryAction ? (
-            <Button asChild size="sm">
-              <Link href={primaryAction.href}>{primaryAction.label}</Link>
-            </Button>
+            <Link href={primaryAction.href}>
+              <Button size="sm">
+                {primaryAction.label}
+              </Button>
+            </Link>
           ) : null}
         </div>
       </div>

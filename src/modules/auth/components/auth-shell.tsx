@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Leaf, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, ClipboardCheck, UserRound } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
@@ -8,19 +8,19 @@ import { Button } from "@/components/ui/button";
 
 const highlights = [
   {
-    icon: Leaf,
-    title: "Terhubung ke backend asli",
-    body: "Frontend langsung memakai API Spring Boot tanpa form server-rendered.",
+    icon: ClipboardCheck,
+    title: "Isi data akun",
+    body: "Lengkapi form sesuai data yang akan Anda gunakan.",
   },
   {
-    icon: ShieldCheck,
-    title: "Session tetap aman",
-    body: "Login tetap memakai session backend sehingga otorisasi tetap terpusat.",
+    icon: UserRound,
+    title: "Periksa kembali data",
+    body: "Pastikan email, username, dan role sudah sesuai.",
   },
   {
     icon: BadgeCheck,
-    title: "Siap untuk modul berikutnya",
-    body: "Struktur auth dipisah rapi agar mudah dipakai lagi untuk dashboard dan fitur lain.",
+    title: "Lanjut ke langkah berikutnya",
+    body: "Setelah selesai, masuk ke akun Anda untuk mulai bekerja.",
   },
 ];
 
@@ -87,7 +87,7 @@ export function AuthShell({
 
               <div className="surface-panel flex flex-col gap-4 rounded-[1.8rem] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="mono-label text-[#888888]">Frontend Auth</p>
+                  <p className="mono-label text-[#888888]">Akses Akun</p>
                   <p className="mt-2 text-sm leading-7 text-[#666666]">
                     {alternatePrompt}
                   </p>

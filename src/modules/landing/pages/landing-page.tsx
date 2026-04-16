@@ -22,26 +22,25 @@ export function LandingPage() {
           <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
               <div className="max-w-2xl">
-                <Badge>Platform Manajemen Kebun Sawit</Badge>
+                <Badge>Mysawit</Badge>
                 <h1 className="display-title mt-7 text-[3.25rem] sm:text-[4.5rem] lg:text-[5.75rem]">
-                  Operasional sawit yang lebih ringkas dan terlihat jelas.
+                  Kelola panen, angkut, dan approval.
                 </h1>
                 <p className="mt-6 max-w-xl text-base leading-7 text-[#666666] sm:text-lg">
-                  MySawit menyatukan panen, pengangkutan, dan pemantauan dalam
-                  satu platform yang ringan dan mudah dipahami.
+                  Masuk atau buat akun untuk mulai bekerja.
                 </p>
 
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                   <Link href="/register">
                     <Button size="lg">
-                      Mulai sekarang
+                      Buat akun
                       <ArrowRight />
                     </Button>
                   </Link>
                   <Link href="/login">
                     <Button variant="secondary" size="lg">
                       <Play className="size-4" />
-                      Masuk ke akun
+                      Masuk
                     </Button>
                   </Link>
                 </div>
@@ -86,13 +85,12 @@ export function LandingPage() {
                   </div>
 
                   <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-6 sm:p-7">
-                    <p className="mono-label text-[#888888]">Highlight</p>
+                    <p className="mono-label text-[#888888]">Status</p>
                     <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-                      Satu dashboard untuk aktivitas lapangan hingga approval.
+                      Pantau pekerjaan per tahap.
                     </h2>
                     <p className="mt-3 max-w-md text-sm leading-7 text-[#666666]">
-                      Dibuat untuk membantu tim melihat status operasional tanpa
-                      tampilan yang padat atau membingungkan.
+                      Lihat progres tanpa berpindah halaman.
                     </p>
                   </div>
                 </div>
@@ -130,9 +128,9 @@ export function LandingPage() {
         <section id="roles" className="border-b border-[rgba(13,13,13,0.05)]">
           <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
             <div className="flex flex-col gap-4 sm:max-w-xl">
-              <p className="mono-label text-[#888888]">Peran Pengguna</p>
+              <p className="mono-label text-[#888888]">Role</p>
               <h2 className="display-title text-[2.5rem] sm:text-[3.4rem]">
-                Empat peran, satu alur kerja.
+                Gunakan akses sesuai tugas.
               </h2>
             </div>
 
@@ -159,14 +157,14 @@ export function LandingPage() {
           <div className="surface-panel rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
-                <p className="mono-label text-[#888888]">Simple Landing Page</p>
+                <p className="mono-label text-[#888888]">Akses Akun</p>
                 <h2 className="display-title mt-4 text-[2.3rem] sm:text-[3rem]">
-                  Clean, ringan, dan langsung ke inti produk.
+                  Masuk atau buat akun.
                 </h2>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link href="/register">
-                  <Button>Daftar sekarang</Button>
+                  <Button>Buat akun</Button>
                 </Link>
                 <Button asChild variant="ghost">
                   <Link href="/design-system">Design system</Link>
