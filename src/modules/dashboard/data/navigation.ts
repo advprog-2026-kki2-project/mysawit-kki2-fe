@@ -1,6 +1,9 @@
 import {
   ClipboardList,
   LayoutDashboard,
+  Truck,
+  Users,
+  WalletCards,
   Sprout,
   type LucideIcon,
 } from "lucide-react";
@@ -33,9 +36,9 @@ export const dashboardNavigation = [
   {
     href: "/harvest",
     label: "Panen",
-    description: "Kirim panen harian.",
+    description: "Kirim dan validasi panen harian.",
     icon: ClipboardList,
-    roles: ["LABORER"],
+    roles: ["LABORER", "FOREMAN"],
   },
   {
     href: "/plantations",
@@ -43,6 +46,27 @@ export const dashboardNavigation = [
     description: "Kelola data plantation.",
     icon: Sprout,
     roles: ["ADMIN"],
+  },
+  {
+    href: "/users",
+    label: "Pengguna",
+    description: "Kelola akun dan assignment buruh.",
+    icon: Users,
+    roles: ["ADMIN"],
+  },
+  {
+    href: "/transport",
+    label: "Transport",
+    description: "Atur pickup dan verifikasi pengiriman.",
+    icon: Truck,
+    roles: ["FOREMAN", "DRIVER", "ADMIN"],
+  },
+  {
+    href: "/payroll",
+    label: "Payroll",
+    description: "Kelola upah dan status payroll.",
+    icon: WalletCards,
+    roles: dashboardRoles,
   },
 ] as const satisfies readonly DashboardNavItem[];
 

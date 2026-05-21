@@ -17,11 +17,23 @@ export class ApiError extends Error {
 }
 
 async function parseError(response: Response) {
+  const fallbackMessage = "Permintaan gagal diproses.";
+
   try {
-    const payload = (await response.json()) as ApiErrorPayload;
-    return payload.error ?? payload.message ?? "Permintaan gagal diproses.";
+    const text = await response.text();
+
+    if (!text) {
+      return fallbackMessage;
+    }
+
+    try {
+      const payload = JSON.parse(text) as ApiErrorPayload;
+      return payload.error ?? payload.message ?? text;
+    } catch {
+      return text;
+    }
   } catch {
-    return "Permintaan gagal diproses.";
+    return fallbackMessage;
   }
 }
 
