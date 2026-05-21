@@ -12,7 +12,9 @@ export function submitHarvest(payload: HarvestSubmissionPayload) {
   formData.append("harvestDate", payload.harvestDate);
   formData.append("weightKg", payload.weightKg);
   formData.append("notes", payload.notes);
-  formData.append("photo", payload.photo);
+  payload.photos.forEach((photo) => {
+    formData.append("photos", photo);
+  });
 
   return requestFormData<HarvestSubmissionResult>("/api/harvests", formData, {
     method: "POST",

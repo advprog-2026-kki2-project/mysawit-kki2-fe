@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Bell, Mail, Search, Sprout } from "lucide-react";
+import { Bell, Mail, Search } from "lucide-react";
 
 import {
   SidebarInset,
@@ -15,82 +15,31 @@ type DashboardShellProps = {
   session: AuthResponse;
   title: string;
   description?: string;
-  aside?: ReactNode;
+  aside?: ReactNode | null;
   children: ReactNode;
 };
 
-function DefaultDashboardAside({
-  displayInitial,
-  session,
-}: {
-  displayInitial: string;
-  session: AuthResponse;
-}) {
+function DefaultDashboardAside({ session }: { session: AuthResponse }) {
   return (
-    <>
-      <section className="rounded-lg border border-[#c4c8ba]/70 bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
-        <div className="flex items-center justify-between">
-          <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
-            Statistik
-          </h2>
-          <Sprout className="size-5 text-[#3f6901]" />
+    <section className="rounded-lg border border-[#c4c8ba]/70 bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+      <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
+        Akun
+      </h2>
+      <dl className="mt-4 space-y-4 text-sm">
+        <div className="flex items-center justify-between gap-4">
+          <dt className="text-[#74796d]">Username</dt>
+          <dd className="truncate font-semibold text-[#1a1c18]">
+            {session.username}
+          </dd>
         </div>
-
-        <div className="mt-6 flex flex-col items-center text-center">
-          <div className="relative inline-flex size-32 items-center justify-center rounded-lg border-[10px] border-[#cdedae]">
-            <div className="absolute -right-2 top-5 rounded-full bg-[#774e15] px-2.5 py-1 text-xs font-semibold text-white">
-              32%
-            </div>
-            <span className="inline-flex size-20 items-center justify-center rounded-lg bg-[#cdedae] font-[var(--font-syne)] text-2xl font-bold text-[#2b4316]">
-              {displayInitial}
-            </span>
-          </div>
-          <h3 className="mt-5 font-[var(--font-syne)] text-xl font-bold text-[#1a1c18]">
-            Selamat bekerja, {session.username}
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-[#74796d]">
-            Pantau pekerjaan sesuai akses role Anda.
-          </p>
+        <div className="flex items-center justify-between gap-4">
+          <dt className="text-[#74796d]">Role</dt>
+          <dd className="font-semibold text-[#2b4316]">
+            {roleLabels[session.role]}
+          </dd>
         </div>
-
-        <div className="mt-6 rounded-lg bg-[#efeee7] p-4">
-          <div className="flex h-28 items-end justify-between gap-3">
-            {[34, 46, 33, 60, 31].map((value, index) => (
-              <span
-                key={`${value}-${index}`}
-                className="w-full rounded-t-lg bg-[#b1d094]"
-                style={{ height: `${value}%` }}
-              />
-            ))}
-          </div>
-          <div className="mt-3 flex justify-between text-xs font-medium text-[#74796d]">
-            <span>Panen</span>
-            <span>Kirim</span>
-            <span>Gaji</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-[#c4c8ba]/70 bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
-        <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
-          Akun
-        </h2>
-        <dl className="mt-4 space-y-4 text-sm">
-          <div className="flex items-center justify-between gap-4">
-            <dt className="text-[#74796d]">Username</dt>
-            <dd className="truncate font-semibold text-[#1a1c18]">
-              {session.username}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <dt className="text-[#74796d]">Role</dt>
-            <dd className="font-semibold text-[#2b4316]">
-              {roleLabels[session.role]}
-            </dd>
-          </div>
-        </dl>
-      </section>
-    </>
+      </dl>
+    </section>
   );
 }
 
@@ -102,6 +51,7 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   const displayInitial = session.username.slice(0, 1).toUpperCase();
+  const shouldRenderAside = aside !== null;
 
   return (
     <SidebarProvider className="min-h-svh bg-[#dadad3]">
@@ -149,7 +99,13 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="grid min-h-0 gap-6 px-4 py-5 sm:px-6 sm:py-6 lg:px-7 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <main
+          className={
+            shouldRenderAside
+              ? "grid min-h-0 gap-6 px-4 py-5 sm:px-6 sm:py-6 lg:px-7 xl:grid-cols-[minmax(0,1fr)_22rem]"
+              : "grid min-h-0 gap-6 px-4 py-5 sm:px-6 sm:py-6 lg:px-7"
+          }
+        >
           <section className="min-w-0 space-y-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div className="min-w-0">
@@ -170,14 +126,11 @@ export function DashboardShell({
             {children}
           </section>
 
-          <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
-            {aside ?? (
-              <DefaultDashboardAside
-                displayInitial={displayInitial}
-                session={session}
-              />
-            )}
-          </aside>
+          {shouldRenderAside ? (
+            <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
+              {aside ?? <DefaultDashboardAside session={session} />}
+            </aside>
+          ) : null}
         </main>
       </SidebarInset>
     </SidebarProvider>

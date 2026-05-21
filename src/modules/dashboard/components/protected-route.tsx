@@ -13,7 +13,7 @@ type ProtectedRouteProps = {
   allowedRoles?: readonly Role[];
   title: string;
   description?: string;
-  aside?: ReactNode | ((session: AuthResponse) => ReactNode);
+  aside?: ReactNode | ((session: AuthResponse) => ReactNode) | null;
   children: ReactNode | ((session: AuthResponse) => ReactNode);
 };
 
@@ -99,7 +99,7 @@ export function ProtectedRoute({
       session={session}
       title={title}
       description={description}
-      aside={aside ? renderSlot(aside, session) : undefined}
+      aside={aside === null ? null : aside ? renderSlot(aside, session) : undefined}
     >
       {renderSlot(children, session)}
     </DashboardShell>

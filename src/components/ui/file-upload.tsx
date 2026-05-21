@@ -10,9 +10,10 @@ type FileUploadProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "type" | "value" | "onChange"
 > & {
-  value: File | null;
-  onChange: (file: File | null) => void;
+  value: File | File[] | null;
+  onChange: (file: File | File[] | null) => void;
   maxSizeMb?: number;
+  maxFiles?: number;
   isUploading?: boolean;
   helperText?: string;
   uploadText?: string;
@@ -34,6 +35,7 @@ function FileUpload({
   value,
   onChange,
   maxSizeMb = 30,
+  maxFiles = 6,
   isUploading = false,
   helperText,
   uploadText = "Upload your file here",
@@ -48,28 +50,38 @@ function FileUpload({
   const [isDragging, setIsDragging] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const isDisabled = disabled || isUploading;
+  const selectedFiles = Array.isArray(value) ? value : value ? [value] : [];
+  const isMultiple = Boolean(props.multiple);
 
   React.useEffect(() => {
-    if (!value && inputRef.current) {
+    if (selectedFiles.length === 0 && inputRef.current) {
       inputRef.current.value = "";
     }
-  }, [value]);
+  }, [selectedFiles.length]);
 
-  function setSelectedFile(file: File | null) {
-    if (!file) {
-      setError(null);
-      onChange(null);
+  function setSelectedFiles(files: File[], options?: { append?: boolean }) {
+    const nextFiles =
+      isMultiple && options?.append ? [...selectedFiles, ...files] : files;
+
+    if (files.length === 0 && options?.append) {
       return;
     }
 
-    if (file.size > maxSizeMb * 1024 * 1024) {
+    if (files.length === 0) {
+      setError(null);
+      onChange(isMultiple ? [] : null);
+      return;
+    }
+
+    const oversizedFile = nextFiles.find((file) => file.size > maxSizeMb * 1024 * 1024);
+    if (oversizedFile) {
       setError(`Ukuran file maksimal ${maxSizeMb}MB.`);
-      onChange(null);
+      onChange(isMultiple ? [] : null);
       return;
     }
 
     setError(null);
-    onChange(file);
+    onChange(isMultiple ? nextFiles.slice(0, maxFiles) : nextFiles[0]);
   }
 
   function handleDrop(event: React.DragEvent<HTMLLabelElement>) {
@@ -80,11 +92,16 @@ function FileUpload({
       return;
     }
 
-    setSelectedFile(event.dataTransfer.files.item(0));
+    setSelectedFiles(Array.from(event.dataTransfer.files), { append: true });
   }
 
-  function handleRemoveFile() {
-    setSelectedFile(null);
+  function handleRemoveFile(fileIndex: number) {
+    if (!isMultiple) {
+      setSelectedFiles([]);
+      return;
+    }
+
+    setSelectedFiles(selectedFiles.filter((_, index) => index !== fileIndex));
   }
 
   return (
@@ -94,10 +111,12 @@ function FileUpload({
         id={inputId}
         type="file"
         accept={accept}
-        required={required && !value}
+        required={required && selectedFiles.length === 0}
         disabled={isDisabled}
         className="sr-only"
-        onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+        onChange={(event) =>
+          setSelectedFiles(Array.from(event.target.files ?? []), { append: true })
+        }
         {...props}
       />
 
@@ -129,36 +148,45 @@ function FileUpload({
       </label>
 
       <div className="flex items-center justify-between gap-3 text-sm text-[#44483e]">
-        <span>{helperText ?? `Maximum size: ${maxSizeMb}MB`}</span>
+        <span>
+          {helperText ??
+            (isMultiple
+              ? `Maximum ${maxFiles} files, ${maxSizeMb}MB each`
+              : `Maximum size: ${maxSizeMb}MB`)}
+        </span>
         {error ? <span className="text-[#93000a]">{error}</span> : null}
       </div>
 
-      {value ? (
-        <div className="flex items-center gap-3">
-          <div className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-lg bg-[#cdedae] px-4 py-3">
-            <div className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#3f6901]/25 bg-white text-[#3f6901]">
-              <FileArchive className="size-4" />
+      {selectedFiles.length > 0 ? (
+        <div className="grid gap-3">
+          {selectedFiles.map((file, index) => (
+            <div key={`${file.name}-${index}`} className="flex items-center gap-3">
+              <div className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-lg bg-[#cdedae] px-4 py-3">
+                <div className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#3f6901]/25 bg-white text-[#3f6901]">
+                  <FileArchive className="size-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[#1a1c18]">
+                    {file.name}
+                  </p>
+                  <p className="mt-1 text-xs text-[#44483e]">
+                    {formatFileSize(file)}
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => handleRemoveFile(index)}
+                disabled={isDisabled}
+                className="size-10 text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a]"
+                aria-label={`Remove ${file.name}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-[#1a1c18]">
-                {value.name}
-              </p>
-              <p className="mt-1 text-xs text-[#44483e]">
-                {formatFileSize(value)}
-              </p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={handleRemoveFile}
-            disabled={isDisabled}
-            className="size-10 text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a]"
-            aria-label="Remove selected file"
-          >
-            <Trash2 className="size-4" />
-          </Button>
+          ))}
         </div>
       ) : null}
     </div>
