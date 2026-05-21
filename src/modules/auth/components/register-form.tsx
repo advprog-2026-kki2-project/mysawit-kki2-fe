@@ -83,11 +83,11 @@ export function RegisterForm() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-6 w-32 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
+        <div className="h-6 w-32 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
       </div>
     );
   }
@@ -95,21 +95,21 @@ export function RegisterForm() {
   if (session) {
     return (
       <div className="space-y-6">
-        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#d4fae8] text-[#0fa76e]">
+        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#cdedae] text-[#3f6901]">
           <CheckCircle2 className="size-5" />
         </div>
         <div>
-          <p className="mono-label text-[#888888]">Sesi Aktif</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+          <p className="mono-label text-[#74796d]">Sesi Aktif</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
             Anda sudah masuk.
           </h2>
-          <p className="mt-3 text-sm leading-7 text-[#666666]">
+          <p className="mt-3 text-sm leading-7 text-[#44483e]">
             Logout jika Anda ingin membuat akun lain.
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
-          <p className="text-sm font-medium text-[#0d0d0d]">
+        <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-[#f4f4ed] px-5 py-4">
+          <p className="text-sm font-medium text-[#1a1c18]">
             Akun aktif: {session.username} ({roleLabels[session.role]})
           </p>
         </div>
@@ -133,7 +133,7 @@ export function RegisterForm() {
         </div>
 
         {error ? (
-          <p className="rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+          <p className="rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
             {error}
           </p>
         ) : null}
@@ -144,18 +144,18 @@ export function RegisterForm() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mono-label text-[#888888]">Daftar</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+        <p className="mono-label text-[#74796d]">Daftar</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Buat akun.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Semua field wajib diisi.
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="register-email">
+          <label className="text-sm font-medium text-[#44483e]" htmlFor="register-email">
             Email
           </label>
           <Input
@@ -169,7 +169,7 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="username">
+          <label className="text-sm font-medium text-[#44483e]" htmlFor="username">
             Username
           </label>
           <Input
@@ -183,7 +183,7 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="register-password">
+          <label className="text-sm font-medium text-[#44483e]" htmlFor="register-password">
             Password
           </label>
           <Input
@@ -197,7 +197,7 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="role">
+          <label className="text-sm font-medium text-[#44483e]" htmlFor="role">
             Role
           </label>
           <Select value={role} onValueChange={(value) => setRole(value as Role)}>
@@ -220,20 +220,20 @@ export function RegisterForm() {
       </form>
 
       {feedback ? (
-        <p className="rounded-[1.3rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] px-4 py-3 text-sm text-[#0d0d0d]">
+        <p className="rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] px-4 py-3 text-sm text-[#1a1c18]">
           {feedback}
         </p>
       ) : null}
 
       {error || sessionError ? (
-        <p className="rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+        <p className="rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
           {error ?? sessionError}
         </p>
       ) : null}
 
-      <p className="text-sm leading-7 text-[#666666]">
+      <p className="text-sm leading-7 text-[#44483e]">
         Sudah punya akun?{" "}
-        <Link className="font-medium text-[#0fa76e]" href="/login">
+        <Link className="font-medium text-[#3f6901]" href="/login">
           Masuk
         </Link>
         .

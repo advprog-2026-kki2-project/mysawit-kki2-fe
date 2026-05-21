@@ -66,19 +66,19 @@ export function HarvestSubmitForm() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-12 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-        <div className="h-72 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
+        <div className="h-12 animate-pulse rounded-lg bg-[#e3e3dc]" />
+        <div className="h-72 animate-pulse rounded-lg bg-[#e3e3dc]" />
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <div className="surface-panel rounded-lg p-6">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Login diperlukan.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Masuk sebagai pekerja untuk mengirim data panen.
         </p>
         <Button asChild className="mt-6">
@@ -90,11 +90,11 @@ export function HarvestSubmitForm() {
 
   if (session.role !== "LABORER") {
     return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <div className="surface-panel rounded-lg p-6">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Akses dibatasi.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Form panen hanya tersedia untuk pekerja. Sesi aktif Anda menggunakan
           role {roleLabels[session.role].toLowerCase()}.
         </p>
@@ -104,18 +104,18 @@ export function HarvestSubmitForm() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Harvest Form</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <section className="surface-panel rounded-lg p-6 sm:p-7">
+        <p className="mono-label text-[#74796d]">Harvest Form</p>
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Catat panen hari ini.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Nama pekerja akan diambil dari sesi backend yang aktif.
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-date">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="harvest-date">
               Tanggal panen
             </label>
             <DatePicker
@@ -128,7 +128,7 @@ export function HarvestSubmitForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="weight-kg">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="weight-kg">
               Berat panen (kg)
             </label>
             <Input
@@ -144,7 +144,7 @@ export function HarvestSubmitForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-notes">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="harvest-notes">
               Catatan
             </label>
             <Textarea
@@ -157,7 +157,7 @@ export function HarvestSubmitForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-photo">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="harvest-photo">
               Foto bukti
             </label>
             <FileUpload
@@ -178,57 +178,57 @@ export function HarvestSubmitForm() {
         </form>
 
         {error ? (
-          <p className="mt-4 rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+          <p className="mt-4 rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
             {error}
           </p>
         ) : null}
       </section>
 
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Submission Status</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <section className="surface-panel rounded-lg p-6 sm:p-7">
+        <p className="mono-label text-[#74796d]">Submission Status</p>
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Ringkasan pengiriman panen.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Backend saat ini sudah mendukung submit panen beserta upload foto.
         </p>
 
         {result ? (
-          <div className="mt-8 rounded-[1.6rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] p-5">
-            <p className="text-sm font-medium text-[#0d0d0d]">{result.message}</p>
+          <div className="mt-8 rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] p-5">
+            <p className="text-sm font-medium text-[#1a1c18]">{result.message}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Pekerja</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
+              <div className="rounded-lg bg-white px-4 py-3">
+                <p className="mono-label text-[#74796d]">Pekerja</p>
+                <p className="mt-2 text-sm font-medium text-[#1a1c18]">
                   {result.laborerName}
                 </p>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Status</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
+              <div className="rounded-lg bg-white px-4 py-3">
+                <p className="mono-label text-[#74796d]">Status</p>
+                <p className="mt-2 text-sm font-medium text-[#1a1c18]">
                   {result.status}
                 </p>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Tanggal</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
+              <div className="rounded-lg bg-white px-4 py-3">
+                <p className="mono-label text-[#74796d]">Tanggal</p>
+                <p className="mt-2 text-sm font-medium text-[#1a1c18]">
                   {result.harvestDate}
                 </p>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Berat</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
+              <div className="rounded-lg bg-white px-4 py-3">
+                <p className="mono-label text-[#74796d]">Berat</p>
+                <p className="mt-2 text-sm font-medium text-[#1a1c18]">
                   {result.weightKg} kg
                 </p>
               </div>
             </div>
-            <div className="mt-3 rounded-[1.25rem] bg-white px-4 py-3">
-              <p className="mono-label text-[#888888]">Catatan</p>
-              <p className="mt-2 text-sm leading-7 text-[#333333]">{result.notes}</p>
+            <div className="mt-3 rounded-lg bg-white px-4 py-3">
+              <p className="mono-label text-[#74796d]">Catatan</p>
+              <p className="mt-2 text-sm leading-7 text-[#44483e]">{result.notes}</p>
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-[1.5rem] border border-dashed border-[rgba(13,13,13,0.1)] px-5 py-8 text-sm text-[#666666]">
+          <div className="mt-8 rounded-lg border border-dashed border-[rgba(116,121,109,0.40)] px-5 py-8 text-sm text-[#44483e]">
             Belum ada pengiriman panen di sesi ini.
           </div>
         )}

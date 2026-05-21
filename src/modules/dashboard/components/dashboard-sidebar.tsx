@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Sprout } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -50,34 +50,35 @@ export function DashboardSidebar({ session }: DashboardSidebarProps) {
   }
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
+    <Sidebar collapsible="icon" className="md:p-5">
+      <SidebarHeader className="px-4 py-5">
         <Link
           href="/dashboard"
-          className="flex min-h-12 items-center gap-3 rounded-full px-2"
+          className="flex min-h-12 items-center gap-3 rounded-lg px-1"
         >
-          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[rgba(13,13,13,0.08)] bg-white text-sm font-semibold text-[#0d0d0d] shadow-[0_1px_2px_rgba(13,13,13,0.04)]">
-            M
+          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#FFFEF1] text-white shadow-[0_8px_20px_rgba(43,67,22,0.16)]">
+            <img src="/logo.png" alt="Logo" className="size-8 aspect-square object-contain" />
           </span>
-          <span className="min-w-0 truncate text-sm font-semibold text-[#0d0d0d]">
-            Mysawit
+          <span className="min-w-0 truncate font-[var(--font-syne)] text-xl font-bold text-[#324a1f]">
+            MySawit
           </span>
         </Link>
       </SidebarHeader>
 
-      <SidebarSeparator />
-
-      <SidebarContent>
+      <SidebarContent className="px-3">
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-1 text-[0.7rem] font-semibold uppercase text-[#74796d]">
+            Overview
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-3">
               {navigation.map(({ href, icon: Icon, label }) => (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === href}
                     tooltip={label}
+                    className="h-11 rounded-lg text-[0.95rem] text-[#1a1c18] hover:bg-[#efeee7] hover:text-[#2b4316] data-[active=true]:!border-[#2b4316]/20 data-[active=true]:!bg-[#cdedae] data-[active=true]:!text-[#2b4316] [&>svg]:!text-[#2b4316]"
                   >
                     <Link href={href}>
                       <Icon className="size-4" />
@@ -91,24 +92,24 @@ export function DashboardSidebar({ session }: DashboardSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarSeparator />
+      <SidebarSeparator className="bg-transparent" />
 
-      <SidebarFooter>
-        <div className="rounded-[1.25rem] border border-[rgba(13,13,13,0.05)] bg-white px-3 py-3 group-data-[collapsible=icon]:hidden">
-          <p className="truncate text-sm font-medium text-[#0d0d0d]">
+      <SidebarFooter className="px-5 pb-5">
+        <div className="rounded-lg border border-[#c4c8ba] bg-[#fafaf2] px-4 py-4 group-data-[collapsible=icon]:hidden">
+          <p className="truncate text-sm font-semibold text-[#1a1c18]">
             {session.username}
           </p>
-          <p className="mt-1 text-xs text-[#666666]">
+          <p className="mt-1 text-xs text-[#74796d]">
             {roleLabels[session.role]}
           </p>
         </div>
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           size="sm"
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="w-full justify-start group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+          className="w-full justify-start text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a] group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
         >
           <LogOut className="size-4" />
           <span className="group-data-[collapsible=icon]:hidden">

@@ -60,11 +60,11 @@ export function HarvestHistoryPanel() {
   }
 
   return (
-    <section className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-6 shadow-[0_2px_4px_rgba(13,13,13,0.03)]">
+    <section className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="mono-label text-[#888888]">Riwayat</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[#0d0d0d]">
+          <p className="mono-label text-[#74796d]">Riwayat</p>
+          <h2 className="mt-3 text-2xl font-semibold text-[#1a1c18]">
             Riwayat panen saya.
           </h2>
         </div>
@@ -92,32 +92,32 @@ export function HarvestHistoryPanel() {
       </form>
 
       {error ? (
-        <p className="mt-4 rounded-[1.25rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+        <p className="mt-4 rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
           {error}
         </p>
       ) : null}
 
       <div className="mt-6 grid gap-3">
         {records.length === 0 ? (
-          <div className="rounded-[1.25rem] border border-dashed border-[rgba(13,13,13,0.1)] px-5 py-7 text-sm text-[#666666]">
+          <div className="rounded-lg border border-dashed border-[rgba(116,121,109,0.40)] px-5 py-7 text-sm text-[#44483e]">
             Belum ada riwayat panen.
           </div>
         ) : (
           records.map((record) => (
-            <article key={record.id} className="rounded-[1.25rem] border border-[rgba(13,13,13,0.05)] bg-[#fbfdfc] p-4">
+            <article key={record.id} className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-[#f4f4ed] p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-[#0d0d0d]">
+                  <p className="text-sm font-semibold text-[#1a1c18]">
                     {record.harvestDate} · {record.weightKg} kg
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#666666]">{record.notes}</p>
+                  <p className="mt-2 text-sm leading-6 text-[#44483e]">{record.notes}</p>
                   {record.rejectionReason ? (
-                    <p className="mt-2 text-sm text-[#a54141]">
+                    <p className="mt-2 text-sm text-[#93000a]">
                       Alasan: {record.rejectionReason}
                     </p>
                   ) : null}
                 </div>
-                <span className="rounded-full border border-[rgba(13,13,13,0.06)] bg-white px-3 py-1 text-xs font-medium text-[#333333]">
+                <span className="rounded-full border border-[rgba(116,121,109,0.28)] bg-white px-3 py-1 text-xs font-medium text-[#44483e]">
                   {record.status}
                 </span>
               </div>

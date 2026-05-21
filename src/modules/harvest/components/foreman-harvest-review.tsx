@@ -87,9 +87,9 @@ export function ForemanHarvestReview() {
   }
 
   return (
-    <section className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-6 shadow-[0_2px_4px_rgba(13,13,13,0.03)]">
-      <p className="mono-label text-[#888888]">Review Mandor</p>
-      <h2 className="mt-3 text-2xl font-semibold text-[#0d0d0d]">
+    <section className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+      <p className="mono-label text-[#74796d]">Review Mandor</p>
+      <h2 className="mt-3 text-2xl font-semibold text-[#1a1c18]">
         Validasi hasil panen.
       </h2>
 
@@ -107,26 +107,26 @@ export function ForemanHarvestReview() {
       </form>
 
       {feedback ? (
-        <p className="mt-4 rounded-[1.25rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] px-4 py-3 text-sm">
+        <p className="mt-4 rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] px-4 py-3 text-sm">
           {feedback}
         </p>
       ) : null}
       {error ? (
-        <p className="mt-4 rounded-[1.25rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+        <p className="mt-4 rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
           {error}
         </p>
       ) : null}
 
       <div className="mt-6 grid gap-4">
         {records.map((record) => (
-          <article key={record.id} className="rounded-[1.25rem] border border-[rgba(13,13,13,0.05)] bg-[#fbfdfc] p-4">
+          <article key={record.id} className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-[#f4f4ed] p-4">
             <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
               <div>
-                <p className="text-sm font-semibold text-[#0d0d0d]">
+                <p className="text-sm font-semibold text-[#1a1c18]">
                   {record.laborerName} · {record.harvestDate} · {record.weightKg} kg
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[#666666]">{record.notes}</p>
-                <p className="mt-2 text-xs font-medium text-[#888888]">
+                <p className="mt-2 text-sm leading-6 text-[#44483e]">{record.notes}</p>
+                <p className="mt-2 text-xs font-medium text-[#74796d]">
                   Status: {record.status}
                 </p>
               </div>

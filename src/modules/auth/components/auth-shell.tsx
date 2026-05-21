@@ -63,7 +63,7 @@ export function AuthShell({
                 <h1 className="display-title text-[3rem] sm:text-[4.2rem] lg:text-[5rem]">
                   {title}
                 </h1>
-                <p className="mt-5 max-w-xl text-base leading-7 text-[#666666] sm:text-lg">
+                <p className="mt-5 max-w-xl text-base leading-7 text-[#44483e] sm:text-lg">
                   {description}
                 </p>
               </div>
@@ -72,23 +72,23 @@ export function AuthShell({
                 {highlights.map(({ icon: Icon, title: itemTitle, body }) => (
                   <article
                     key={itemTitle}
-                    className="surface-card rounded-[1.6rem] p-5"
+                    className="surface-card rounded-lg p-5"
                   >
-                    <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-[#d4fae8] text-[#0fa76e]">
+                    <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-[#cdedae] text-[#3f6901]">
                       <Icon className="size-5" />
                     </div>
-                    <h2 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#0d0d0d]">
+                    <h2 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#1a1c18]">
                       {itemTitle}
                     </h2>
-                    <p className="mt-2 text-sm leading-7 text-[#666666]">{body}</p>
+                    <p className="mt-2 text-sm leading-7 text-[#44483e]">{body}</p>
                   </article>
                 ))}
               </div>
 
-              <div className="surface-panel flex flex-col gap-4 rounded-[1.8rem] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="surface-panel flex flex-col gap-4 rounded-lg px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="mono-label text-[#888888]">Akses Akun</p>
-                  <p className="mt-2 text-sm leading-7 text-[#666666]">
+                  <p className="mono-label text-[#74796d]">Akses Akun</p>
+                  <p className="mt-2 text-sm leading-7 text-[#44483e]">
                     {alternatePrompt}
                   </p>
                 </div>
@@ -101,7 +101,7 @@ export function AuthShell({
               </div>
             </div>
 
-            <div className="surface-panel rounded-[2rem] p-5 sm:p-6">{children}</div>
+            <div className="surface-panel rounded-lg p-5 sm:p-6">{children}</div>
           </div>
         </section>
       </main>

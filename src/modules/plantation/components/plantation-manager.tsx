@@ -163,19 +163,19 @@ export function PlantationManager() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-12 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-        <div className="h-64 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
+        <div className="h-12 animate-pulse rounded-lg bg-[#e3e3dc]" />
+        <div className="h-64 animate-pulse rounded-lg bg-[#e3e3dc]" />
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <div className="surface-panel rounded-lg p-6">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Login diperlukan.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Masuk sebagai admin untuk mengelola data plantation.
         </p>
         <Button asChild className="mt-6">
@@ -187,11 +187,11 @@ export function PlantationManager() {
 
   if (session.role !== "ADMIN") {
     return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+      <div className="surface-panel rounded-lg p-6">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Akses dibatasi.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Halaman ini hanya untuk admin. Sesi aktif Anda menggunakan role{" "}
           {formatRole(session.role).toLowerCase()}.
         </p>
@@ -201,14 +201,14 @@ export function PlantationManager() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
+      <section className="surface-panel rounded-lg p-6 sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="mono-label text-[#888888]">Plantation Form</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+            <p className="mono-label text-[#74796d]">Plantation Form</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
               {editingPlantationId ? "Edit plantation." : "Tambah plantation."}
             </h2>
-            <p className="mt-3 text-sm leading-7 text-[#666666]">
+            <p className="mt-3 text-sm leading-7 text-[#44483e]">
               Isi kode, area, dan empat titik koordinat.
             </p>
           </div>
@@ -221,7 +221,7 @@ export function PlantationManager() {
 
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="plantation-code">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="plantation-code">
               Kode plantation
             </label>
             <Input
@@ -240,7 +240,7 @@ export function PlantationManager() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="plantation-name">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="plantation-name">
               Nama plantation
             </label>
             <Input
@@ -258,7 +258,7 @@ export function PlantationManager() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="area-hectares">
+            <label className="text-sm font-medium text-[#44483e]" htmlFor="area-hectares">
               Area (hektar)
             </label>
             <Input
@@ -279,14 +279,14 @@ export function PlantationManager() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-sm font-medium text-[#333333]">Koordinat sudut</p>
+            <p className="text-sm font-medium text-[#44483e]">Koordinat sudut</p>
             <div className="grid gap-3 sm:grid-cols-2">
               {formState.corners.map((corner, index) => (
                 <div
                   key={`corner-${index}`}
-                  className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-4"
+                  className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-4"
                 >
-                  <p className="text-sm font-medium text-[#0d0d0d]">
+                  <p className="text-sm font-medium text-[#1a1c18]">
                     Titik {index + 1}
                   </p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -341,26 +341,26 @@ export function PlantationManager() {
         </form>
 
         {feedback ? (
-          <p className="mt-4 rounded-[1.3rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] px-4 py-3 text-sm text-[#0d0d0d]">
+          <p className="mt-4 rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] px-4 py-3 text-sm text-[#1a1c18]">
             {feedback}
           </p>
         ) : null}
 
         {error ? (
-          <p className="mt-4 rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+          <p className="mt-4 rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
             {error}
           </p>
         ) : null}
       </section>
 
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
+      <section className="surface-panel rounded-lg p-6 sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="mono-label text-[#888888]">Plantation List</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+            <p className="mono-label text-[#74796d]">Plantation List</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
               Data plantation aktif.
             </h2>
-            <p className="mt-3 text-sm leading-7 text-[#666666]">
+            <p className="mt-3 text-sm leading-7 text-[#44483e]">
               Gunakan edit untuk memuat data ke form.
             </p>
           </div>
@@ -372,31 +372,31 @@ export function PlantationManager() {
         <div className="mt-8 space-y-4">
           {isFetching ? (
             <div className="space-y-3">
-              <div className="h-28 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-              <div className="h-28 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
+              <div className="h-28 animate-pulse rounded-lg bg-[#e3e3dc]" />
+              <div className="h-28 animate-pulse rounded-lg bg-[#e3e3dc]" />
             </div>
           ) : plantations.length === 0 ? (
-            <div className="rounded-[1.5rem] border border-dashed border-[rgba(13,13,13,0.1)] px-5 py-8 text-sm text-[#666666]">
+            <div className="rounded-lg border border-dashed border-[rgba(116,121,109,0.40)] px-5 py-8 text-sm text-[#44483e]">
               Belum ada plantation yang tersimpan.
             </div>
           ) : (
             plantations.map((plantation) => (
               <article
                 key={plantation.plantationId}
-                className="rounded-[1.6rem] border border-[rgba(13,13,13,0.05)] bg-white p-5"
+                className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-5"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="mono-label text-[#888888]">
+                    <p className="mono-label text-[#74796d]">
                       {plantation.plantationCode}
                     </p>
-                    <h3 className="mt-2 text-xl font-semibold text-[#0d0d0d]">
+                    <h3 className="mt-2 text-xl font-semibold text-[#1a1c18]">
                       {plantation.plantationName}
                     </h3>
-                    <p className="mt-2 text-sm text-[#666666]">
+                    <p className="mt-2 text-sm text-[#44483e]">
                       Area {plantation.areaHectares} hektar
                     </p>
-                    <p className="mt-3 text-sm leading-7 text-[#666666]">
+                    <p className="mt-3 text-sm leading-7 text-[#44483e]">
                       {plantation.corners
                         .map((corner) => `(${corner.x}, ${corner.y})`)
                         .join(" · ")}
