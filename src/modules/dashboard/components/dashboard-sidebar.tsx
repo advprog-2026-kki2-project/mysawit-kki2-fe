@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Sprout } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,13 @@ export function DashboardSidebar({ session }: DashboardSidebarProps) {
           className="flex min-h-12 items-center gap-3 rounded-lg px-1"
         >
           <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#FFFEF1] text-white shadow-[0_8px_20px_rgba(43,67,22,0.16)]">
-            <img src="/logo.png" alt="Logo" className="size-8 aspect-square object-contain" />
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="aspect-square object-contain"
+            />
           </span>
           <span className="min-w-0 truncate font-[var(--font-syne)] text-xl font-bold text-[#324a1f]">
             MySawit

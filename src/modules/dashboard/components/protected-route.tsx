@@ -13,11 +13,12 @@ type ProtectedRouteProps = {
   allowedRoles?: readonly Role[];
   title: string;
   description?: string;
+  aside?: ReactNode | ((session: AuthResponse) => ReactNode);
   children: ReactNode | ((session: AuthResponse) => ReactNode);
 };
 
-function renderChildren(
-  children: ProtectedRouteProps["children"],
+function renderSlot(
+  children: ReactNode | ((session: AuthResponse) => ReactNode),
   session: AuthResponse,
 ) {
   if (typeof children === "function") {
@@ -31,6 +32,7 @@ export function ProtectedRoute({
   allowedRoles,
   title,
   description,
+  aside,
   children,
 }: ProtectedRouteProps) {
   const pathname = usePathname();
@@ -93,8 +95,13 @@ export function ProtectedRoute({
   }
 
   return (
-    <DashboardShell session={session} title={title} description={description}>
-      {renderChildren(children, session)}
+    <DashboardShell
+      session={session}
+      title={title}
+      description={description}
+      aside={aside ? renderSlot(aside, session) : undefined}
+    >
+      {renderSlot(children, session)}
     </DashboardShell>
   );
 }
