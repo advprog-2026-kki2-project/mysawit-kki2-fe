@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { startTransition, useState, type FormEvent } from "react";
+import { startTransition, useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, LogOut, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,7 @@ export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [safeNextPath, setSafeNextPath] = useState("/dashboard");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +26,14 @@ export function LoginForm() {
     error: sessionError,
     refreshSession,
   } = useAuthSession();
+
+  useEffect(() => {
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+
+    if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")) {
+      setSafeNextPath(nextPath);
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,7 +46,7 @@ export function LoginForm() {
       setFeedback(result.message);
       await refreshSession();
       startTransition(() => {
-        router.push("/");
+        router.push(safeNextPath);
         router.refresh();
       });
     } catch (caughtError) {
@@ -106,12 +115,12 @@ export function LoginForm() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link href="/">
-            <Button>
-              Kembali
+          <Button asChild>
+            <Link href="/dashboard">
+              Dashboard
               <ArrowRight className="size-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <Button
             type="button"
             variant="secondary"

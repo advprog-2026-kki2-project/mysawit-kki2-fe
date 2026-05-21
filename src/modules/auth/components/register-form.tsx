@@ -116,8 +116,8 @@ export function RegisterForm() {
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild>
-            <Link href="/">
-              Kembali
+            <Link href="/dashboard">
+              Dashboard
               <ArrowRight className="size-4" />
             </Link>
           </Button>

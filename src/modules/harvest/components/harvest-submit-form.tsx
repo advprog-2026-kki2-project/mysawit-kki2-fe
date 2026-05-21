@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/modules/auth/data/auth-api";
@@ -18,13 +20,17 @@ export function HarvestSubmitForm() {
   const [weightKg, setWeightKg] = useState("");
   const [notes, setNotes] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
-  const [photoInputKey, setPhotoInputKey] = useState(0);
   const [result, setResult] = useState<HarvestSubmissionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!harvestDate) {
+      setError("Tanggal panen wajib dipilih.");
+      return;
+    }
+
     if (!photo) {
       setError("Foto bukti wajib diunggah.");
       return;
@@ -46,7 +52,6 @@ export function HarvestSubmitForm() {
       setWeightKg("");
       setNotes("");
       setPhoto(null);
-      setPhotoInputKey((current) => current + 1);
     } catch (caughtError) {
       if (caughtError instanceof ApiError || caughtError instanceof Error) {
         setError(caughtError.message);
@@ -113,12 +118,12 @@ export function HarvestSubmitForm() {
             <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-date">
               Tanggal panen
             </label>
-            <Input
+            <DatePicker
               id="harvest-date"
-              type="date"
               value={harvestDate}
-              onChange={(event) => setHarvestDate(event.target.value)}
-              required
+              onChange={setHarvestDate}
+              placeholder="Pilih tanggal panen"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -155,12 +160,14 @@ export function HarvestSubmitForm() {
             <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-photo">
               Foto bukti
             </label>
-            <Input
-              key={photoInputKey}
+            <FileUpload
               id="harvest-photo"
-              type="file"
               accept="image/*"
-              onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
+              value={photo}
+              onChange={setPhoto}
+              isUploading={isSubmitting}
+              uploadText="Upload foto bukti panen"
+              helperText="Format gambar, maksimum 30MB"
               required
             />
           </div>

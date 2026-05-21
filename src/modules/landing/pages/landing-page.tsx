@@ -16,29 +16,17 @@ import {
   workflowSteps,
 } from "../data/content";
 
-function getRoleRoute(role: string) {
-  if (role === "ADMIN") {
-    return "/plantations";
-  }
-
-  if (role === "LABORER") {
-    return "/harvest";
-  }
-
-  return null;
-}
-
 export function LandingPage() {
   const { session, isLoading } = useAuthSession();
   const sessionRoleLabel = session ? roleLabels[session.role] : null;
-  const roleRoute = session ? getRoleRoute(session.role) : null;
+  const roleRoute = session ? "/dashboard" : null;
   const sessionNavLinks = session
     ? [
         { href: "#overview", label: "Overview" },
         roleRoute
           ? {
               href: roleRoute,
-              label: session.role === "ADMIN" ? "Plantations" : "Panen",
+              label: "Dashboard",
             }
           : { href: "#roles", label: "Roles" },
       ]
@@ -70,11 +58,7 @@ export function LandingPage() {
                     <>
                       <Link href={roleRoute ?? "#roles"}>
                         <Button size="lg">
-                          {session.role === "ADMIN"
-                            ? "Kelola plantation"
-                            : session.role === "LABORER"
-                              ? "Catat panen"
-                              : "Lihat role kerja"}
+                          Buka dashboard
                           <ArrowRight />
                         </Button>
                       </Link>
