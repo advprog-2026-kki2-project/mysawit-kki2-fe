@@ -65,12 +65,12 @@ function DatePicker({
           variant="secondary"
           disabled={disabled}
           className={cn(
-            "h-12 w-full justify-start rounded-full px-5 text-left font-normal",
-            !selectedDate && "text-[#888888]",
+            "h-12 w-full justify-start rounded-lg px-5 text-left font-normal",
+            !selectedDate && "text-[#74796d]",
             className,
           )}
         >
-          <CalendarIcon className="size-4 text-[#0fa76e]" />
+          <CalendarIcon className="size-4 text-[#3f6901]" />
           <span className="truncate">
             {selectedDate ? displayFormatter.format(selectedDate) : placeholder}
           </span>
@@ -78,7 +78,7 @@ function DatePicker({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-auto rounded-[1.25rem] border-[rgba(13,13,13,0.08)] bg-white p-2 shadow-[0_12px_30px_rgba(13,13,13,0.08)]"
+        className="w-auto rounded-lg border-[#c4c8ba] bg-white p-2 shadow-[0_18px_44px_rgba(119,78,21,0.08)]"
       >
         <Calendar
           mode="single"

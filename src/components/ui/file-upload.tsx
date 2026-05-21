@@ -112,38 +112,38 @@ function FileUpload({
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         className={cn(
-          "flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-[#7c3cff]/55 bg-[#fbfaff] px-5 py-8 text-center transition-colors",
-          "hover:border-[#5b00ff] hover:bg-[#f6f0ff] focus-within:border-[#5b00ff] focus-within:ring-2 focus-within:ring-[#5b00ff]/15",
-          isDragging && "border-[#5b00ff] bg-[#f2eaff]",
+          "flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[#2b4316]/55 bg-[#fffee1] px-5 py-8 text-center transition-colors",
+          "hover:border-[#3f6901] hover:bg-[#efeee7] focus-within:border-[#3f6901] focus-within:ring-2 focus-within:ring-[#3f6901]/15",
+          isDragging && "border-[#3f6901] bg-[#e9e8e1]",
           isDisabled && "cursor-not-allowed opacity-70",
         )}
       >
         {isUploading ? (
-          <LoaderCircle className="size-7 animate-spin text-[#666666]" />
+          <LoaderCircle className="size-7 animate-spin text-[#44483e]" />
         ) : (
-          <Upload className="size-7 text-[#666666]" />
+          <Upload className="size-7 text-[#44483e]" />
         )}
-        <span className="mt-4 text-sm text-[#666666]">
+        <span className="mt-4 text-sm text-[#44483e]">
           {isUploading ? "Uploading file..." : uploadText}
         </span>
       </label>
 
-      <div className="flex items-center justify-between gap-3 text-sm text-[#666666]">
+      <div className="flex items-center justify-between gap-3 text-sm text-[#44483e]">
         <span>{helperText ?? `Maximum size: ${maxSizeMb}MB`}</span>
-        {error ? <span className="text-[#a54141]">{error}</span> : null}
+        {error ? <span className="text-[#93000a]">{error}</span> : null}
       </div>
 
       {value ? (
         <div className="flex items-center gap-3">
-          <div className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-[1.25rem] bg-[#eee5ff] px-4 py-3">
-            <div className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[#5b00ff]/25 bg-white text-[#5b00ff]">
+          <div className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-lg bg-[#cdedae] px-4 py-3">
+            <div className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#3f6901]/25 bg-white text-[#3f6901]">
               <FileArchive className="size-4" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-[#0d0d0d]">
+              <p className="truncate text-sm font-semibold text-[#1a1c18]">
                 {value.name}
               </p>
-              <p className="mt-1 text-xs text-[#333333]">
+              <p className="mt-1 text-xs text-[#44483e]">
                 {formatFileSize(value)}
               </p>
             </div>
@@ -154,7 +154,7 @@ function FileUpload({
             size="icon"
             onClick={handleRemoveFile}
             disabled={isDisabled}
-            className="size-10 text-[#e85d67] hover:bg-[#ffecef] hover:text-[#c73945]"
+            className="size-10 text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a]"
             aria-label="Remove selected file"
           >
             <Trash2 className="size-4" />
