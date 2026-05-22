@@ -24,6 +24,7 @@ export type HarvestRecord = {
   notes: string;
   photoPath: string;
   photoPaths: string[];
+  photoUrls: string[];
   status: string;
   rejectionReason: string | null;
   reviewedBy: string | null;
