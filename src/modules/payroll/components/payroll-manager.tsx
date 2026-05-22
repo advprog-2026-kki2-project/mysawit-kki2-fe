@@ -6,9 +6,11 @@ import {
   Calculator,
   Check,
   CreditCard,
+  ExternalLink,
   Filter,
   History,
   Hourglass,
+  LoaderCircle,
   RefreshCcw,
   Save,
   Scale,
@@ -34,8 +36,10 @@ import { ApiError } from "@/modules/auth/data/auth-api";
 import type { AuthResponse, Role } from "@/modules/auth/data/types";
 import {
   acceptPayroll,
+  createXenditTopUp,
   getWallet,
   getWalletTransactions,
+  getXenditTopUps,
   getPayrolls,
   getWageConfiguration,
   rejectPayroll,
@@ -45,10 +49,13 @@ import {
 import {
   payrollStatusLabels,
   payrollStatusOptions,
+  xenditTopUpStatusLabels,
   type Payroll,
   type PayrollStatus,
   type Wallet,
   type WalletTransaction,
+  type XenditTopUpStatus,
+  type XenditWalletTopUp,
 } from "@/modules/payroll/data/types";
 
 type PayrollManagerProps = {
@@ -107,11 +114,15 @@ export function PayrollManager({ session }: PayrollManagerProps) {
   const [foremanWage, setForemanWage] = useState("");
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [xenditTopUps, setXenditTopUps] = useState<XenditWalletTopUp[]>([]);
+  const [latestXenditTopUp, setLatestXenditTopUp] =
+    useState<XenditWalletTopUp | null>(null);
   const [topUpAmount, setTopUpAmount] = useState("");
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingTopUp, setIsCreatingTopUp] = useState(false);
   const pendingPayrolls = payrolls.filter((payroll) => payroll.status === "PENDING");
   const acceptedPayrolls = payrolls.filter((payroll) => payroll.status === "ACCEPTED");
   const rejectedPayrolls = payrolls.filter((payroll) => payroll.status === "REJECTED");
@@ -196,12 +207,15 @@ export function PayrollManager({ session }: PayrollManagerProps) {
 
   async function loadWallet() {
     try {
-      const [walletResult, transactionResult] = await Promise.all([
+      const [walletResult, transactionResult, xenditTopUpResult] = await Promise.all([
         getWallet(),
         getWalletTransactions(),
+        isAdmin ? getXenditTopUps() : Promise.resolve([]),
       ]);
       setWallet(walletResult);
       setTransactions(transactionResult);
+      setXenditTopUps(xenditTopUpResult);
+      setLatestXenditTopUp(xenditTopUpResult[0] ?? null);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Wallet tidak dapat dimuat.");
     }
@@ -235,13 +249,40 @@ export function PayrollManager({ session }: PayrollManagerProps) {
   async function handleTopUp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isAdmin) return;
+    setFeedback(null);
+    setError(null);
+    setIsCreatingTopUp(true);
+    try {
+      const payment = await createXenditTopUp(Number(topUpAmount));
+      setLatestXenditTopUp(payment);
+      setXenditTopUps((current) => [payment, ...current.filter((item) => item.id !== payment.id)]);
+      setTopUpAmount("");
+      setFeedback("Invoice Xendit dibuat. Anda akan diarahkan ke halaman pembayaran.");
+      if (!payment.invoiceUrl) {
+        throw new Error("Invoice URL Xendit tidak tersedia.");
+      }
+      window.location.assign(payment.invoiceUrl);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Top up gagal diproses.");
+    } finally {
+      setIsCreatingTopUp(false);
+    }
+  }
+
+  async function handleManualTopUp() {
+    if (!isAdmin) return;
+    setFeedback(null);
+    setError(null);
+    setIsCreatingTopUp(true);
     try {
       await topUpWallet(Number(topUpAmount));
       setTopUpAmount("");
-      setFeedback("Saldo wallet berhasil ditambahkan melalui sandbox gateway.");
+      setFeedback("Saldo wallet berhasil ditambahkan secara manual.");
       await loadWallet();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Top up gagal diproses.");
+      setError(caughtError instanceof Error ? caughtError.message : "Top up manual gagal diproses.");
+    } finally {
+      setIsCreatingTopUp(false);
     }
   }
 
@@ -476,7 +517,7 @@ export function PayrollManager({ session }: PayrollManagerProps) {
 
           <div className="overflow-x-auto">
             <div className="min-w-[760px]">
-              <div className={cnPayrollGrid(isAdmin, "border-b border-[rgba(116,121,109,0.16)] px-5 py-3 text-xs font-bold uppercase text-[#74796d]")}>
+              <div className={cnPayrollGrid(isAdmin, "border-b border-[rgba(116,121,109,0.16)] px-5 py-3 text-xs font-bold text-[#74796d]")}>
                 <span>{isAdmin ? "Personel" : roleCopy?.sourceLabel}</span>
                 <span>Perhitungan</span>
                 <span className="text-right">Net Amount</span>
@@ -569,7 +610,7 @@ export function PayrollManager({ session }: PayrollManagerProps) {
             <p className="mt-1 text-sm font-semibold text-[#a8c7b4]">SawitDollar</p>
           </div>
           <div className="mt-5 rounded-lg bg-white/10 p-4">
-            <p className="mono-label text-[#a8c7b4]">Local Equivalent</p>
+            <p className="mono-label text-[#a8c7b4]">in Rupiah</p>
             <p className="mt-2 text-lg font-bold">{formatRupiah(wallet?.rupiahEquivalent ?? 0)}</p>
           </div>
           {isAdmin ? (
@@ -584,13 +625,88 @@ export function PayrollManager({ session }: PayrollManagerProps) {
                 className="border-white/20 bg-white text-[#1a1c18]"
                 required
               />
-              <Button type="submit" className="w-full border-white bg-white text-[#0f3d2e] hover:bg-[#cdedae]">
-                <CreditCard className="size-4" />
-                Top Up Balance
+              <Button
+                type="submit"
+                className="w-full border-white bg-white text-[#0f3d2e] hover:bg-[#cdedae]"
+                disabled={isCreatingTopUp}
+              >
+                {isCreatingTopUp ? <LoaderCircle className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+                Pay with Xendit
               </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                disabled={isCreatingTopUp || !topUpAmount}
+                onClick={() => void handleManualTopUp()}
+              >
+                <WalletCards className="size-4" />
+                Manual Top Up
+              </Button>
+              {latestXenditTopUp ? (
+                <div className="rounded-lg bg-white/10 p-3 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-semibold text-[#a8c7b4]">Xendit Invoice</span>
+                    <Badge variant="default" className="bg-[#cdedae] text-[#2b4316]">
+                      {xenditTopUpStatusLabels[latestXenditTopUp.status]}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 font-bold">{formatRupiah(latestXenditTopUp.rupiahAmount)}</p>
+                  {latestXenditTopUp.invoiceUrl ? (
+                    <a
+                      href={latestXenditTopUp.invoiceUrl}
+                      className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-[#cdedae] underline-offset-4 hover:underline"
+                    >
+                      Continue payment <ExternalLink className="size-3" />
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
             </form>
           ) : null}
         </section>
+
+        {isAdmin ? (
+          <section className="rounded-lg border border-[rgba(116,121,109,0.22)] bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+            <div className="flex items-center justify-between gap-3">
+              <p className="mono-label text-[#74796d]">Riwayat Pembayaran</p>
+              <Button type="button" variant="ghost" size="icon" onClick={() => void loadWallet()} aria-label="Refresh payment history">
+                <RefreshCcw className="size-4" />
+              </Button>
+            </div>
+            <div className="mt-4 space-y-3">
+              {xenditTopUps.slice(0, 5).map((payment) => (
+                <div key={payment.id} className="rounded-lg border border-[rgba(116,121,109,0.18)] bg-[#f4f4ed] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-[#1a1c18]">{formatRupiah(payment.rupiahAmount)}</p>
+                      <p className="mt-1 text-xs text-[#74796d]">{formatDateTime(payment.createdAt)}</p>
+                    </div>
+                    <Badge variant="outline" className={cnTopUpStatusBadge(payment.status)}>
+                      {xenditTopUpStatusLabels[payment.status]}
+                    </Badge>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-medium text-[#74796d]">
+                      {payment.paymentChannel ?? payment.paymentMethod ?? "Menunggu pembayaran"}
+                    </p>
+                    {payment.invoiceUrl && payment.status === "PENDING" ? (
+                      <a
+                        href={payment.invoiceUrl}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#3f6901] underline-offset-4 hover:underline"
+                      >
+                        Bayar <ExternalLink className="size-3" />
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+              {xenditTopUps.length === 0 ? (
+                <p className="rounded-lg bg-[#f4f4ed] p-3 text-sm text-[#74796d]">Belum ada pembayaran Xendit.</p>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
 
         <section className="rounded-lg border border-[rgba(116,121,109,0.22)] bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
           <div className="flex items-center justify-between gap-3">
@@ -642,6 +758,17 @@ function formatDateTime(value: string) {
 
 function cnPayrollGrid(isAdmin: boolean, className: string) {
   return `grid ${isAdmin ? "grid-cols-[1.3fr_1.45fr_0.8fr_0.75fr]" : "grid-cols-[1.1fr_1.45fr_0.8fr]"} gap-4 ${className}`;
+}
+
+function cnTopUpStatusBadge(status: XenditTopUpStatus) {
+  const tone = {
+    PENDING: "border-[#d6a100] bg-[#fff8db] text-[#6f5200]",
+    PAID: "border-[#3f6901] bg-[#cdedae] text-[#2b4316]",
+    EXPIRED: "border-[#74796d] bg-[#e9e8e1] text-[#44483e]",
+    FAILED: "border-[#ba1a1a] bg-[#ffdad6] text-[#93000a]",
+  } satisfies Record<XenditTopUpStatus, string>;
+
+  return `px-2 py-0.5 text-[0.65rem] ${tone[status]}`;
 }
 
 function getInitials(value: string) {
