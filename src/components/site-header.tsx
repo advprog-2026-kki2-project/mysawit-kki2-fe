@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 import { ApiError, logout } from "@/modules/auth/data/auth-api";
 import { roleLabels } from "@/modules/auth/data/types";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
+import Image from "next/image";
 
 const links = [
   { href: "#overview", label: "Overview" },
   { href: "#roles", label: "Roles" },
-  { href: "/design-system", label: "Design System" },
 ];
 
 type HeaderAction = {
@@ -68,13 +68,17 @@ export function SiteHeader({
     >
       <div className="mx-auto flex h-18 w-full max-w-6xl items-center justify-between gap-4 px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="inline-flex size-9 items-center justify-center rounded-lg bg-[#2b4316] font-[var(--font-syne)] text-sm font-bold text-white shadow-[0_8px_20px_rgba(43,67,22,0.14)]">
+          {/* <span className="inline-flex size-9 items-center justify-center rounded-lg bg-[#2b4316] font-[var(--font-syne)] text-sm font-bold text-white shadow-[0_8px_20px_rgba(43,67,22,0.14)]">
             M
-          </span>
-          <div className="flex flex-col">
-            <span className="font-[var(--font-syne)] text-sm font-bold text-[#1a1c18]">
-              Mysawit
-            </span>
+          </span> */}
+
+          <div className="relative aspect-square w-20">
+            <Image
+              alt="Logo"
+              fill
+              className="object-contain"
+              src={"/logo-big-color.png"}
+            />
           </div>
         </Link>
 
@@ -124,9 +128,7 @@ export function SiteHeader({
 
               {primaryAction ? (
                 <Link href={primaryAction.href}>
-                  <Button size="sm">
-                    {primaryAction.label}
-                  </Button>
+                  <Button size="sm">{primaryAction.label}</Button>
                 </Link>
               ) : null}
             </>

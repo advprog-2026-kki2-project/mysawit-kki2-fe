@@ -48,7 +48,6 @@ export function AuthShell({
       <SiteHeader
         navLinks={[
           { href: "/", label: "Beranda" },
-          { href: "/design-system", label: "Design System" },
         ]}
         secondaryAction={{ href: "/", label: "Kembali", variant: "secondary" }}
         primaryAction={{ href: alternateHref, label: alternateLabel }}
