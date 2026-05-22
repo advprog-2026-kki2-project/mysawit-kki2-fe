@@ -1,10 +1,9 @@
 import { SiteHeader } from "@/components/site-header";
-import { Badge } from "@/components/ui/badge";
 import { PlantationManager } from "@/modules/plantation/components/plantation-manager";
 
 export function PlantationPage() {
   return (
-    <div className="page-shell bg-background text-foreground">
+    <div className="page-shell bg-background text-foreground min-h-screen">
       <SiteHeader
         navLinks={[
           { href: "/", label: "Beranda" },
@@ -12,17 +11,18 @@ export function PlantationPage() {
         ]}
       />
 
-      <main>
-        <section className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-18">
-          <div className="space-y-6">
-            <div className="max-w-2xl">
-              <Badge>Plantation</Badge>
-              <h1 className="display-title mt-5 text-[2.8rem] sm:text-[3.6rem]">
-                Kelola data plantation.
+      <main className="pb-16">
+        <section className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="space-y-8">
+            <div className="max-w-3xl space-y-4">
+              <span className="badge inline-flex items-center text-[10px] bg-forest-100 text-forest px-3.5 py-1 rounded-full tracking-widest font-mono font-bold">
+                MySawit Plantation Management
+              </span>
+              <h1 className="display-title text-4xl sm:text-5xl lg:text-6xl text-forest-700 font-extrabold tracking-tight">
+                Plantation Management.
               </h1>
-              <p className="mt-4 text-base leading-7 text-[#666666]">
-                Halaman ini memakai flow CRUD plantation yang sudah tersedia di
-                backend.
+              <p className="text-sm sm:text-base leading-relaxed text-ink-700 max-w-2xl">
+                Configure plantation, set plantation boundaries, and assign drivers and foremen to manage your plantations.
               </p>
             </div>
 
