@@ -100,8 +100,8 @@ export function UserManagementPanel({ session }: UserManagementPanelProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState<Role | "ALL">("ALL");
   const [search, setSearch] = useState("");
+  const [foremanSearch, setForemanSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [assignment, setAssignment] = useState<Record<number, string>>({});
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateUserForm>(
     initialCreateUserForm,
@@ -180,6 +180,7 @@ export function UserManagementPanel({ session }: UserManagementPanelProps) {
 
     try {
       setSelectedUser(await getUser(userId));
+      setForemanSearch("");
     } catch (caughtError) {
       setError(readError(caughtError, "Detail pengguna tidak dapat dimuat."));
     } finally {
@@ -236,11 +237,6 @@ export function UserManagementPanel({ session }: UserManagementPanelProps) {
       const updatedUser = await assignForeman(laborer.id, foremanId);
       const foremanName = userById.get(foremanId)?.username ?? "mandor";
       setFeedback(`${updatedUser.username} berhasil ditugaskan ke ${foremanName}.`);
-      setAssignment((current) => {
-        const next = { ...current };
-        delete next[laborer.id];
-        return next;
-      });
       await loadUsers(updatedUser.id);
     } catch (caughtError) {
       setError(readError(caughtError, "Assignment gagal."));
@@ -688,57 +684,34 @@ export function UserManagementPanel({ session }: UserManagementPanelProps) {
   }
 
   function renderLaborerAssignment(user: User) {
-    const selectedForemanId =
-      assignment[user.id] ?? (user.foremanId ? String(user.foremanId) : "");
     const foreman = user.foremanId ? userById.get(user.foremanId) : null;
+    const query = foremanSearch.trim().toLowerCase();
+    const visibleForemen = foremen.filter((foremanOption) => {
+      if (!query) {
+        return true;
+      }
+
+      return (
+        foremanOption.username.toLowerCase().includes(query) ||
+        foremanOption.email.toLowerCase().includes(query) ||
+        formatUserCode(foremanOption).toLowerCase().includes(query)
+      );
+    });
 
     return (
       <section className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="size-4 text-[#2b4316]" />
-          <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
-            Assignment Mandor
-          </h2>
-        </div>
-        <p className="mt-2 text-sm leading-6 text-[#74796d]">
-          Tempatkan buruh ke mandor, atau pindahkan ke mandor lain.
-        </p>
-
-        <div className="mt-5 rounded-lg border border-[rgba(116,121,109,0.18)] bg-[#fffee1]/35 px-4 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.01em] text-[#74796d]">
-            Mandor Saat Ini
-          </p>
-          <p className="mt-1 font-semibold text-[#1a1c18]">
-            {foreman ? foreman.username : "Belum ditugaskan"}
-          </p>
-        </div>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
-          <Select
-            value={selectedForemanId}
-            onValueChange={(value) =>
-              setAssignment((current) => ({ ...current, [user.id]: value }))
-            }
-          >
-            <SelectTrigger className="h-12 w-full px-4">
-              <SelectValue placeholder="Pilih mandor" />
-            </SelectTrigger>
-            <SelectContent>
-              {foremen.map((foremanOption) => (
-                <SelectItem key={foremanOption.id} value={String(foremanOption.id)}>
-                  {foremanOption.username}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            onClick={() => void handleAssign(user, Number(selectedForemanId))}
-            disabled={actionKey === `assign-${user.id}` || foremen.length === 0}
-          >
-            <UserCheck className="size-4" />
-            {user.foremanId ? "Pindahkan" : "Assign"}
-          </Button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-4 text-[#2b4316]" />
+              <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
+                Assignment Mandor
+              </h2>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-[#74796d]">
+              Pilih mandor dari daftar untuk menempatkan atau memindahkan buruh.
+            </p>
+          </div>
           <Button
             type="button"
             variant="ghost"
@@ -750,6 +723,93 @@ export function UserManagementPanel({ session }: UserManagementPanelProps) {
             <UserMinus className="size-4" />
             Copot
           </Button>
+        </div>
+
+        <div className="mt-5 rounded-lg border border-[rgba(116,121,109,0.18)] bg-[#fffee1]/35 px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.01em] text-[#74796d]">
+            Mandor Saat Ini
+          </p>
+          <p className="mt-1 font-semibold text-[#1a1c18]">
+            {foreman ? foreman.username : "Belum ditugaskan"}
+          </p>
+        </div>
+
+        <label className="relative mt-4 block">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#74796d]" />
+          <span className="sr-only">Cari mandor</span>
+          <Input
+            value={foremanSearch}
+            onChange={(event) => setForemanSearch(event.target.value)}
+            placeholder="Cari mandor berdasarkan nama, email, atau ID..."
+            className="pl-11"
+          />
+        </label>
+
+        <div className="mt-4 overflow-hidden rounded-lg border border-[rgba(116,121,109,0.18)]">
+          <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_8rem] gap-3 bg-[#efeee7] px-4 py-3 text-xs font-semibold uppercase tracking-[0.01em] text-[#44483e]">
+            <span>Mandor</span>
+            <span>Kontak</span>
+            <span className="text-right">Aksi</span>
+          </div>
+
+          <div className="max-h-[26rem] overflow-y-auto">
+            {visibleForemen.map((foremanOption) => {
+              const isCurrent = foremanOption.id === user.foremanId;
+
+              return (
+                <article
+                  key={foremanOption.id}
+                  className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_8rem] gap-3 border-t border-[rgba(116,121,109,0.14)] px-4 py-3 transition hover:bg-[#fffee1]/45"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#cdedae] text-sm font-bold text-[#2b4316]">
+                      {foremanOption.username.slice(0, 1).toUpperCase()}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-[#1a1c18]">
+                        {foremanOption.username}
+                      </p>
+                      <p className="mt-1 text-xs text-[#74796d]">
+                        {formatUserCode(foremanOption)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="min-w-0 text-sm text-[#44483e]">
+                    <p className="truncate">{foremanOption.email}</p>
+                    {isCurrent ? (
+                      <Badge variant="default" className="mt-2">
+                        Mandor saat ini
+                      </Badge>
+                    ) : (
+                      <p className="mt-2 text-xs text-[#74796d]">Tersedia</p>
+                    )}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={isCurrent ? "secondary" : "primary"}
+                      onClick={() => void handleAssign(user, foremanOption.id)}
+                      disabled={
+                        isCurrent ||
+                        actionKey === `assign-${user.id}` ||
+                        foremen.length === 0
+                      }
+                    >
+                      <UserCheck className="size-4" />
+                      {isCurrent ? "Saat ini" : user.foremanId ? "Pilih" : "Assign"}
+                    </Button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          {visibleForemen.length === 0 ? (
+            <p className="border-t border-[rgba(116,121,109,0.14)] px-4 py-8 text-center text-sm text-[#74796d]">
+              Tidak ada mandor yang cocok.
+            </p>
+          ) : null}
         </div>
       </section>
     );
