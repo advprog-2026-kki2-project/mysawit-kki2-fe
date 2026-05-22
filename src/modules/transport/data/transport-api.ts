@@ -49,6 +49,12 @@ export function getForemanApprovedDeliveries() {
   });
 }
 
+export function getTransportById(transportId: number | string) {
+  return requestJson<Transport>(`/api/transport/${transportId}`, {
+    method: "GET",
+  });
+}
+
 export function verifyTransportByForeman(
   transportId: number,
   approved: boolean,
