@@ -50,7 +50,7 @@ export function getForemen() {
   });
 }
 
-export function createForeman(payload: { foremanName: string; employeeCode: string }) {
+export function createForeman(payload: { foremanId?: string; foremanName: string; employeeCode: string }) {
   return requestJson<Foreman>("/api/foremen", {
     method: "POST",
     body: JSON.stringify(payload),
@@ -82,7 +82,7 @@ export function getDrivers() {
   });
 }
 
-export function createDriver(payload: { driverName: string; licenseNumber: string }) {
+export function createDriver(payload: { driverId?: string; driverName: string; licenseNumber: string }) {
   return requestJson<Driver>("/api/drivers", {
     method: "POST",
     body: JSON.stringify(payload),

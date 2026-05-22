@@ -29,6 +29,8 @@ import { ApiError } from "@/lib/api-client";
 import {
   assignDriverToPlantation,
   assignForemanToPlantation,
+  createDriver,
+  createForeman,
   createPlantation,
   deletePlantation,
   getDrivers,
@@ -43,6 +45,7 @@ import type {
   PlantationCoordinate,
   PlantationPayload,
 } from "@/modules/plantation/data/types";
+import { getUsers } from "@/modules/users/data/users-api";
 
 type PlantationFormState = {
   plantationCode: string;
@@ -300,14 +303,27 @@ export function PlantationManager() {
     setError(null);
 
     try {
-      const [plantationResult, foremanResult, driverResult] = await Promise.all([
+      const [plantationResult, foremanResult, driverResult, driverUsers, foremanUsers] = await Promise.all([
         getPlantations(),
         getForemen(),
         getDrivers(),
+        getUsers({ role: "DRIVER" }),
+        getUsers({ role: "FOREMAN" }),
       ]);
+      const driverIds = new Set(driverResult.map((driver) => driver.driverId));
+      const missingDriverUsers = driverUsers.filter((user) => !driverIds.has(user.username));
+      const syncedDrivers = missingDriverUsers.length > 0
+        ? await syncDriverUsers(missingDriverUsers)
+        : [];
+      const foremanIds = new Set(foremanResult.map((foreman) => foreman.foremanId));
+      const missingForemanUsers = foremanUsers.filter((user) => !foremanIds.has(user.username));
+      const syncedForemen = missingForemanUsers.length > 0
+        ? await syncForemanUsers(missingForemanUsers)
+        : [];
+
       setPlantations(plantationResult);
-      setForemen(foremanResult);
-      setDrivers(driverResult);
+      setForemen([...foremanResult, ...syncedForemen]);
+      setDrivers([...driverResult, ...syncedDrivers]);
       setSelectedPlantationId(
         nextSelectedId && plantationResult.some((item) => item.plantationId === nextSelectedId)
           ? nextSelectedId
@@ -318,6 +334,40 @@ export function PlantationManager() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function syncDriverUsers(driverUsers: Array<{ email: string; username: string }>) {
+    const results = await Promise.all(
+      driverUsers.map((user) =>
+        createDriver({
+          driverId: user.username,
+          driverName: user.username,
+          licenseNumber: user.email,
+        }).catch(() => null),
+      ),
+    );
+
+    return results.filter((driver): driver is Driver => driver !== null);
+  }
+
+  async function syncForemanUsers(
+    foremanUsers: Array<{
+      email: string;
+      username: string;
+      foremanCertificationNumber: string | null;
+    }>,
+  ) {
+    const results = await Promise.all(
+      foremanUsers.map((user) =>
+        createForeman({
+          foremanId: user.username,
+          foremanName: user.username,
+          employeeCode: user.foremanCertificationNumber ?? user.email,
+        }).catch(() => null),
+      ),
+    );
+
+    return results.filter((foreman): foreman is Foreman => foreman !== null);
   }
 
   useEffect(() => {
@@ -878,6 +928,11 @@ export function PlantationManager() {
                       </div>
                     );
                   })}
+                  {availableDrivers.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-[rgba(116,121,109,0.35)] px-4 py-6 text-center text-sm text-[#74796d] md:col-span-2">
+                      Tidak ada supir lain yang bisa ditugaskan ke kebun ini.
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </section>

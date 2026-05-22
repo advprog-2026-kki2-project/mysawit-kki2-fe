@@ -45,6 +45,7 @@ import { cn } from "@/lib/utils";
 import { ApiError } from "@/modules/auth/data/auth-api";
 import type { AuthResponse } from "@/modules/auth/data/types";
 import {
+  createDriver,
   getDrivers,
   getPlantations,
 } from "@/modules/plantation/data/plantation-api";
@@ -68,6 +69,7 @@ import {
   type Transport,
   type TransportStatus,
 } from "@/modules/transport/data/types";
+import { getUsers } from "@/modules/users/data/users-api";
 
 type TransportManagerProps = {
   session: AuthResponse;
@@ -158,7 +160,7 @@ export function TransportManager({ session }: TransportManagerProps) {
   );
   const assignedDriverIds = selectedPlantation?.assignedDriverIds ?? [];
   const visibleDrivers = drivers.filter((driver) => {
-    const matchesPlantation = assignedDriverIds.length === 0 || assignedDriverIds.includes(driver.driverId);
+    const matchesPlantation = assignedDriverIds.includes(driver.driverId);
     const matchesSearch =
       !driverSearch.trim() ||
       `${driver.driverName} ${driver.licenseNumber} ${driver.driverId}`
@@ -207,16 +209,23 @@ export function TransportManager({ session }: TransportManagerProps) {
 
     try {
       if (session.role === "FOREMAN") {
-        const [pickups, ongoing, plantationList, driverList] = await Promise.all([
+        const [pickups, ongoing, plantationList, driverList, driverUsers] = await Promise.all([
           getAvailablePickups(),
           getOngoingDeliveries(),
           getPlantations(),
           getDrivers(),
+          getUsers({ role: "DRIVER" }),
         ]);
+        const driverIds = new Set(driverList.map((driver) => driver.driverId));
+        const missingDriverUsers = driverUsers.filter((user) => !driverIds.has(user.username));
+        const syncedDrivers = missingDriverUsers.length > 0
+          ? await syncDriverUsers(missingDriverUsers)
+          : [];
+
         setAvailablePickups(pickups);
         setTransports(ongoing);
         setPlantations(plantationList);
-        setDrivers(driverList);
+        setDrivers([...driverList, ...syncedDrivers]);
         setSelectedPlantationId((current) => current || plantationList[0]?.plantationId || "");
       } else if (session.role === "ADMIN") {
         setTransports(await getForemanApprovedDeliveries());
@@ -235,6 +244,20 @@ export function TransportManager({ session }: TransportManagerProps) {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function syncDriverUsers(driverUsers: Array<{ email: string; username: string }>) {
+    const results = await Promise.all(
+      driverUsers.map((user) =>
+        createDriver({
+          driverId: user.username,
+          driverName: user.username,
+          licenseNumber: user.email,
+        }).catch(() => null),
+      ),
+    );
+
+    return results.filter((driver): driver is Driver => driver !== null);
   }
 
   useEffect(() => {
