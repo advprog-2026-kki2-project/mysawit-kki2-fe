@@ -1,5 +1,6 @@
 import {
   BriefcaseBusiness,
+  ClipboardCheck,
   ShieldCheck,
   Tractor,
   Truck,
@@ -8,9 +9,9 @@ import {
 } from "lucide-react";
 
 export const landingStats = [
-  { value: "4", label: "Role" },
-  { value: "1", label: "Alur kerja" },
-  { value: "24/7", label: "Status" },
+  { value: "4", label: "Role aktif" },
+  { value: "3", label: "Tahap pantau" },
+  { value: "24/7", label: "Akses status" },
 ];
 
 export const roleCards = [
@@ -40,17 +41,17 @@ export const featureCards = [
   {
     icon: Waves,
     title: "Catat proses",
-    body: "Kelola panen, angkut, dan approval dalam satu alur.",
+    body: "Panen, angkut, dan approval tersusun dalam satu alur kerja yang mudah ditelusuri.",
   },
   {
     icon: ShieldCheck,
     title: "Atur akses",
-    body: "Setiap pengguna bekerja sesuai role.",
+    body: "Setiap pengguna melihat menu dan aksi yang sesuai dengan tanggung jawabnya.",
   },
   {
     icon: Users,
     title: "Lihat status",
-    body: "Pantau progres kerja di satu tempat.",
+    body: "Tim lapangan dan admin pusat bisa memantau progres tanpa menunggu laporan manual.",
   },
 ];
 
@@ -59,4 +60,40 @@ export const workflowSteps = [
   "Mandor validasi",
   "Supir angkut",
   "Admin monitor",
+];
+
+export const previewTasks = [
+  {
+    title: "Panen Blok A-17",
+    meta: "32 tandan siap validasi",
+    status: "Mandor",
+  },
+  {
+    title: "Pickup TPH Timur",
+    meta: "Supir menuju lokasi",
+    status: "Angkut",
+  },
+  {
+    title: "Approval Harian",
+    meta: "Ringkasan masuk pusat",
+    status: "Admin",
+  },
+];
+
+export const trustPoints = [
+  {
+    icon: ClipboardCheck,
+    title: "Data lebih rapi",
+    body: "Catatan lapangan dibuat terstruktur sejak awal.",
+  },
+  {
+    icon: Truck,
+    title: "Koordinasi cepat",
+    body: "Pengangkutan terlihat jelas dari pickup sampai selesai.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Approval terkontrol",
+    body: "Admin pusat memantau pekerjaan dengan jejak status.",
+  },
 ];
