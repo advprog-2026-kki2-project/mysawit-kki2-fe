@@ -1,5 +1,10 @@
 import { requestEmpty, requestJson } from "@/lib/api-client";
-import type { User, UserFilters } from "@/modules/users/data/types";
+import type {
+  CreateUserPayload,
+  CreateUserResult,
+  User,
+  UserFilters,
+} from "@/modules/users/data/types";
 
 function buildUserQuery(filters?: UserFilters) {
   const params = new URLSearchParams();
@@ -29,6 +34,13 @@ export function getUsers(filters?: UserFilters) {
 export function getUser(userId: number) {
   return requestJson<User>(`/api/users/${userId}`, {
     method: "GET",
+  });
+}
+
+export function createUser(payload: CreateUserPayload) {
+  return requestJson<CreateUserResult>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 }
 

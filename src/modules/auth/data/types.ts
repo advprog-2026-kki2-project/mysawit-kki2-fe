@@ -31,4 +31,5 @@ export type RegisterPayload = {
   username: string;
   password: string;
   role: Role;
+  foremanCertificationNumber?: string;
 };

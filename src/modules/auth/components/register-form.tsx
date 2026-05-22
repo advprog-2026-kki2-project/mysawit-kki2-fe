@@ -28,6 +28,8 @@ export function RegisterForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("LABORER");
+  const [foremanCertificationNumber, setForemanCertificationNumber] =
+    useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +43,15 @@ export function RegisterForm() {
     setIsSubmitting(true);
 
     try {
-      const result = await register({ email, username, password, role });
+      const result = await register({
+        email,
+        username,
+        password,
+        role,
+        ...(role === "FOREMAN"
+          ? { foremanCertificationNumber: foremanCertificationNumber.trim() }
+          : {}),
+      });
       setFeedback(
         `${result.message} Akun ${result.username} siap dipakai untuk login.`
       );
@@ -170,12 +180,12 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-[#44483e]" htmlFor="username">
-            Username
+            Nama
           </label>
           <Input
             id="username"
             type="text"
-            placeholder="mis. budi.sawit"
+            placeholder="mis. Budi Santoso"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
             required
@@ -200,7 +210,16 @@ export function RegisterForm() {
           <label className="text-sm font-medium text-[#44483e]" htmlFor="role">
             Role
           </label>
-          <Select value={role} onValueChange={(value) => setRole(value as Role)}>
+          <Select
+            value={role}
+            onValueChange={(value) => {
+              const nextRole = value as Role;
+              setRole(nextRole);
+              if (nextRole !== "FOREMAN") {
+                setForemanCertificationNumber("");
+              }
+            }}
+          >
             <SelectTrigger id="role" className="h-12 w-full px-5">
               <SelectValue placeholder="Pilih role" />
             </SelectTrigger>
@@ -213,6 +232,27 @@ export function RegisterForm() {
             </SelectContent>
           </Select>
         </div>
+
+        {role === "FOREMAN" ? (
+          <div className="space-y-2">
+            <label
+              className="text-sm font-medium text-[#44483e]"
+              htmlFor="foreman-certification-number"
+            >
+              Nomor Sertifikasi Mandor
+            </label>
+            <Input
+              id="foreman-certification-number"
+              type="text"
+              placeholder="mis. MDR-2026-001"
+              value={foremanCertificationNumber}
+              onChange={(event) =>
+                setForemanCertificationNumber(event.target.value)
+              }
+              required
+            />
+          </div>
+        ) : null}
 
         <Button className="w-full" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Membuat akun..." : "Buat akun"}

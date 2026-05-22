@@ -1,3 +1,5 @@
+"use client";
+
 import type { Role } from "@/modules/auth/data/types";
 import { ProtectedRoute } from "@/modules/dashboard/components/protected-route";
 import { UserManagementPanel } from "@/modules/users/components/user-management-panel";
@@ -9,9 +11,10 @@ export function UsersPage() {
     <ProtectedRoute
       allowedRoles={allowedRoles}
       title="Manajemen Pengguna"
-      description="Kelola akun, filter pengguna, assignment buruh ke mandor, dan penghapusan akun."
+      description="Kelola akses akun, role, detail profil, dan assignment buruh ke mandor."
+      aside={null}
     >
-      <UserManagementPanel />
+      {(session) => <UserManagementPanel session={session} />}
     </ProtectedRoute>
   );
 }
