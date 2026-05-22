@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { Check, RefreshCcw, Save, X } from "lucide-react";
+import { Check, CreditCard, RefreshCcw, Save, WalletCards, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,16 +17,21 @@ import { ApiError } from "@/modules/auth/data/auth-api";
 import type { AuthResponse } from "@/modules/auth/data/types";
 import {
   acceptPayroll,
+  getWallet,
+  getWalletTransactions,
   getPayrolls,
   getWageConfiguration,
   rejectPayroll,
   saveWageConfiguration,
+  topUpWallet,
 } from "@/modules/payroll/data/payroll-api";
 import {
   payrollStatusLabels,
   payrollStatusOptions,
   type Payroll,
   type PayrollStatus,
+  type Wallet,
+  type WalletTransaction,
 } from "@/modules/payroll/data/types";
 
 type PayrollManagerProps = {
@@ -39,9 +44,13 @@ export function PayrollManager({ session }: PayrollManagerProps) {
     session.role === "ADMIN" ? "" : session.username,
   );
   const [status, setStatus] = useState<PayrollStatus | "ALL">("ALL");
+  const [date, setDate] = useState("");
   const [laborerWage, setLaborerWage] = useState("");
   const [driverWage, setDriverWage] = useState("");
   const [foremanWage, setForemanWage] = useState("");
+  const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [topUpAmount, setTopUpAmount] = useState("");
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +73,7 @@ export function PayrollManager({ session }: PayrollManagerProps) {
     setIsLoading(true);
     setError(null);
     try {
-      setPayrolls(await getPayrolls({ beneficiaryReference, status }));
+      setPayrolls(await getPayrolls({ beneficiaryReference, status, date }));
     } catch (caughtError) {
       setError(
         caughtError instanceof ApiError || caughtError instanceof Error
@@ -76,10 +85,24 @@ export function PayrollManager({ session }: PayrollManagerProps) {
     }
   }
 
+  async function loadWallet() {
+    try {
+      const [walletResult, transactionResult] = await Promise.all([
+        getWallet(),
+        getWalletTransactions(),
+      ]);
+      setWallet(walletResult);
+      setTransactions(transactionResult);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Wallet tidak dapat dimuat.");
+    }
+  }
+
   useEffect(() => {
     if (session.role === "ADMIN") {
       void loadWages();
     }
+    void loadWallet();
     void loadPayrolls();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -98,6 +121,18 @@ export function PayrollManager({ session }: PayrollManagerProps) {
     }
   }
 
+  async function handleTopUp(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      await topUpWallet(Number(topUpAmount));
+      setTopUpAmount("");
+      setFeedback("Saldo wallet berhasil ditambahkan melalui sandbox gateway.");
+      await loadWallet();
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Top up gagal diproses.");
+    }
+  }
+
   async function handleFilter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await loadPayrolls();
@@ -106,6 +141,7 @@ export function PayrollManager({ session }: PayrollManagerProps) {
   async function handleAccept(payroll: Payroll) {
     await acceptPayroll(payroll.id);
     setFeedback(`Payroll ${payroll.id} disetujui.`);
+    await loadWallet();
     await loadPayrolls();
   }
 
@@ -123,6 +159,60 @@ export function PayrollManager({ session }: PayrollManagerProps) {
 
   return (
     <div className="space-y-6">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+          <p className="mono-label text-[#74796d]">Wallet</p>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-3xl font-semibold text-[#1a1c18]">
+                {formatCurrency(wallet?.balance ?? 0)} SawitDollar
+              </p>
+              <p className="mt-1 text-sm text-[#74796d]">
+                Setara {formatRupiah(wallet?.rupiahEquivalent ?? 0)}
+              </p>
+            </div>
+            <WalletCards className="size-8 text-[#0f3d2e]" />
+          </div>
+          {session.role === "ADMIN" ? (
+            <form className="mt-5 flex gap-2" onSubmit={handleTopUp}>
+              <Input
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={topUpAmount}
+                onChange={(event) => setTopUpAmount(event.target.value)}
+                placeholder="Jumlah top up"
+                required
+              />
+              <Button type="submit">
+                <CreditCard className="size-4" />
+                Top Up
+              </Button>
+            </form>
+          ) : null}
+        </div>
+
+        <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+          <p className="mono-label text-[#74796d]">Transaksi Terakhir</p>
+          <div className="mt-4 space-y-3">
+            {transactions.slice(0, 3).map((transaction) => (
+              <div key={transaction.id} className="flex items-start justify-between gap-3 border-b border-[rgba(116,121,109,0.18)] pb-3 last:border-b-0 last:pb-0">
+                <div>
+                  <p className="text-sm font-semibold text-[#1a1c18]">{transaction.description}</p>
+                  <p className="mt-1 text-xs text-[#74796d]">{formatDateTime(transaction.createdAt)}</p>
+                </div>
+                <p className={transaction.amount < 0 ? "text-sm font-semibold text-[#93000a]" : "text-sm font-semibold text-[#0f3d2e]"}>
+                  {formatCurrency(transaction.amount)}
+                </p>
+              </div>
+            ))}
+            {transactions.length === 0 ? (
+              <p className="text-sm text-[#74796d]">Belum ada transaksi wallet.</p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
       {session.role === "ADMIN" ? (
         <section className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
           <p className="mono-label text-[#74796d]">Wage Config</p>
@@ -146,11 +236,17 @@ export function PayrollManager({ session }: PayrollManagerProps) {
           </h2>
         </div>
 
-        <form className="mt-6 grid gap-3 lg:grid-cols-[1fr_12rem_auto]" onSubmit={handleFilter}>
+        <form className="mt-6 grid gap-3 lg:grid-cols-[1fr_12rem_12rem_auto]" onSubmit={handleFilter}>
           <Input
             value={beneficiaryReference}
             onChange={(event) => setBeneficiaryReference(event.target.value)}
             placeholder="Beneficiary reference"
+          />
+          <Input
+            type="date"
+            value={date}
+            onChange={(event) => setDate(event.target.value)}
+            aria-label="Tanggal payroll"
           />
           <Select value={status} onValueChange={(value) => setStatus(value as PayrollStatus | "ALL")}>
             <SelectTrigger className="h-12 w-full px-5"><SelectValue /></SelectTrigger>
@@ -214,4 +310,25 @@ export function PayrollManager({ session }: PayrollManagerProps) {
       </section>
     </div>
   );
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatRupiah(value: number) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }

@@ -2,6 +2,8 @@ import { requestJson } from "@/lib/api-client";
 import type {
   Payroll,
   PayrollStatus,
+  Wallet,
+  WalletTransaction,
   WageConfiguration,
   WageConfigurationPayload,
 } from "@/modules/payroll/data/types";
@@ -22,6 +24,7 @@ export function saveWageConfiguration(payload: WageConfigurationPayload) {
 export function getPayrolls(filters: {
   beneficiaryReference?: string;
   status?: PayrollStatus | "ALL";
+  date?: string;
 }) {
   const params = new URLSearchParams();
   if (filters.beneficiaryReference?.trim()) {
@@ -30,10 +33,35 @@ export function getPayrolls(filters: {
   if (filters.status && filters.status !== "ALL") {
     params.set("status", filters.status);
   }
+  if (filters.date) {
+    params.set("date", filters.date);
+  }
   const query = params.toString();
 
   return requestJson<Payroll[]>(`/api/payroll${query ? `?${query}` : ""}`, {
     method: "GET",
+  });
+}
+
+export function getWallet() {
+  return requestJson<Wallet>("/api/payment/wallet", {
+    method: "GET",
+  });
+}
+
+export function getWalletTransactions() {
+  return requestJson<WalletTransaction[]>("/api/payment/wallet/transactions", {
+    method: "GET",
+  });
+}
+
+export function topUpWallet(amount: number) {
+  return requestJson<Wallet>("/api/payment/wallet/top-up", {
+    method: "POST",
+    body: JSON.stringify({
+      amount,
+      gatewayReference: `SANDBOX-${Date.now()}`,
+    }),
   });
 }
 

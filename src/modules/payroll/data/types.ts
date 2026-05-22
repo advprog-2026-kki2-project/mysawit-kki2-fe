@@ -25,6 +25,29 @@ export type Payroll = {
   createdAt: string;
 };
 
+export type Wallet = {
+  accountReference: string;
+  accountRole: Role;
+  balance: number;
+  rupiahEquivalent: number;
+  updatedAt: string;
+};
+
+export type WalletTransactionType =
+  | "TOP_UP"
+  | "PAYROLL_CREDIT"
+  | "PAYROLL_DEBIT";
+
+export type WalletTransaction = {
+  id: string;
+  accountReference: string;
+  type: WalletTransactionType;
+  amount: number;
+  description: string;
+  referenceId: string;
+  createdAt: string;
+};
+
 export type WageConfiguration = {
   id: number;
   laborerWagePerKg: number;
