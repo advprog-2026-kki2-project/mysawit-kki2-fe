@@ -67,6 +67,9 @@ function LaborerHarvestWorkspace({ session }: { session: AuthResponse }) {
   const [isPayrollLoading, setIsPayrollLoading] = useState(false);
 
   const pendingReportCount = records.filter((record) => record.status === "PENDING").length;
+  const todayRecord = records.find(
+    (record) => record.harvestDate === new Date().toISOString().slice(0, 10),
+  );
   const totalHarvestKg = records.reduce((total, record) => total + record.weightKg, 0);
   const acceptedPayrollAmount = payrolls
     .filter((payroll) => payroll.status === "ACCEPTED")
@@ -154,6 +157,8 @@ function LaborerHarvestWorkspace({ session }: { session: AuthResponse }) {
 
         <div id="report-harvest">
           <HarvestSubmitForm
+            isTodaySubmitted={Boolean(todayRecord)}
+            todaySubmittedStatus={todayRecord?.status ?? null}
             onSubmitted={() => {
               setRefreshKey((current) => current + 1);
               void loadPayrolls();

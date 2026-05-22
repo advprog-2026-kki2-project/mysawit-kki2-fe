@@ -14,13 +14,19 @@ import type { HarvestSubmissionResult } from "@/modules/harvest/data/types";
 
 type HarvestSubmitFormProps = {
   onSubmitted?: (result: HarvestSubmissionResult) => void;
+  isTodaySubmitted?: boolean;
+  todaySubmittedStatus?: string | null;
 };
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
+export function HarvestSubmitForm({
+  isTodaySubmitted = false,
+  onSubmitted,
+  todaySubmittedStatus,
+}: HarvestSubmitFormProps) {
   const [harvestDate, setHarvestDate] = useState(todayIsoDate());
   const [weightKg, setWeightKg] = useState("");
   const [notes, setNotes] = useState("");
@@ -36,8 +42,13 @@ export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
       return;
     }
 
-    if (photos.length < 2) {
-      setError("Unggah minimal 2 foto bukti panen.");
+    if (isTodaySubmitted) {
+      setError("Laporan panen hari ini sudah tersimpan. Silakan menunggu besok.");
+      return;
+    }
+
+    if (photos.length < 1) {
+      setError("Unggah minimal 1 foto bukti panen.");
       return;
     }
 
@@ -73,15 +84,20 @@ export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
     <section className="overflow-hidden rounded-lg border border-[#c4c8ba]/70 bg-white shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
       <div className="border-b border-[#c4c8ba]/70 bg-[#203b28] px-5 py-4 text-white">
         <h2 className="font-[var(--font-syne)] text-lg font-bold">
-          Report Harvest
+          Catat Panen Hari Ini
         </h2>
+        {isTodaySubmitted ? (
+          <p className="mt-1 text-sm text-white/75">
+            Laporan hari ini sudah tersimpan dengan status {todaySubmittedStatus ?? "PENDING"}.
+          </p>
+        ) : null}
       </div>
 
       <form className="space-y-5 p-5" onSubmit={handleSubmit}>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
-              Total harvest weight (kg)
+              Kilogram sawit dipanen
             </span>
             <Input
               id="weight-kg"
@@ -91,27 +107,28 @@ export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
               value={weightKg}
               onChange={(event) => setWeightKg(event.target.value)}
               placeholder="0.00"
+              disabled={isSubmitting || isTodaySubmitted}
               required
             />
           </label>
 
           <label className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
-              Reporting date
+              Tanggal panen
             </span>
             <DatePicker
               id="harvest-date"
               value={harvestDate}
               onChange={setHarvestDate}
               placeholder="Pilih tanggal panen"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isTodaySubmitted}
             />
           </label>
         </div>
 
         <label className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
-            Harvest notes / field conditions
+            <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+            Berita hasil panen
           </span>
           <Textarea
             id="harvest-notes"
@@ -119,13 +136,14 @@ export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
             onChange={(event) => setNotes(event.target.value)}
             placeholder="Catat kondisi lapangan, kendala akses, atau kualitas panen."
             className="min-h-28"
+            disabled={isSubmitting || isTodaySubmitted}
             required
           />
         </label>
 
         <div className="space-y-3">
-          <p className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
-            Attach photos (min 2)
+            <p className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+            Bukti foto
           </p>
           <FileUpload
             id="harvest-photos"
@@ -137,19 +155,23 @@ export function HarvestSubmitForm({ onSubmitted }: HarvestSubmitFormProps) {
             }}
             multiple
             maxFiles={6}
-            isUploading={isSubmitting}
+            isUploading={isSubmitting || isTodaySubmitted}
             uploadText="Upload foto bukti panen"
-            helperText="Pilih minimal 2 foto, maksimal 6 foto, masing-masing 30MB"
+            helperText="Pilih minimal 1 foto, maksimal 6 foto, masing-masing 30MB"
             required
           />
           <p className="text-sm text-[#74796d]">
-            Dua foto bukti diperlukan untuk setiap laporan panen.
+            Foto bukti diperlukan untuk setiap laporan panen.
           </p>
         </div>
 
-        <Button className="w-full" type="submit" disabled={isSubmitting}>
+        <Button className="w-full" type="submit" disabled={isSubmitting || isTodaySubmitted}>
           <Send className="size-4" />
-          {isSubmitting ? "Mengirim laporan..." : "Submit daily report"}
+          {isTodaySubmitted
+            ? "Laporan hari ini sudah ada"
+            : isSubmitting
+              ? "Mengirim laporan..."
+              : "Kirim laporan panen"}
         </Button>
       </form>
 
