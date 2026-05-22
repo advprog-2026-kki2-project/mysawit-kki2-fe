@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { getDeliveryById } from '../mockData';
+import { getTransportById, updateTransportStatus } from '../data/transport-api';
 import { StatusTimeline } from '../components/StatusTimeline';
 import { StatusBadge } from '../components/StatusBadge';
 import { formatDate, isDeliveryInTransit } from '../deliveryUtils';
-import type { HarvestItem } from '../types';
+import type { Delivery, HarvestItem } from '../types';
 import Link from 'next/link';
 
 export function DriverDeliveryDetailPage() {
@@ -15,11 +16,37 @@ export function DriverDeliveryDetailPage() {
   const router = useRouter();
   const deliveryId = params.id as string;
 
-  const delivery = getDeliveryById(deliveryId);
+  const [delivery, setDelivery] = useState<Delivery>(() => getDeliveryById(deliveryId) as Delivery);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(delivery?.status || '');
+  const [selectedStatus, setSelectedStatus] = useState<Delivery['status']>(delivery.status);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!delivery) {
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const t = await getTransportById(deliveryId);
+        if (!mounted) return;
+        setDelivery(t as unknown as Delivery);
+        setSelectedStatus((t as unknown as Delivery).status ?? delivery.status);
+      } catch (err) {
+        const fallback = getDeliveryById(deliveryId);
+        if (!fallback) setError('Failed to load delivery from server.');
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [deliveryId]);
+
+  if (!delivery && !isLoading) {
     return (
       <div className="min-h-screen bg-[#FFFFF1] flex items-center justify-center">
         <div className="text-center">
@@ -35,23 +62,41 @@ export function DriverDeliveryDetailPage() {
     );
   }
 
-  const handleStatusUpdate = async (newStatus: string) => {
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FFFFF1] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[#1A1C18] mb-4">Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Link href="/transport/driver/active" className="text-[#415B2B] hover:underline">
+            Back to deliveries
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handleStatusUpdate = async (newStatus: Delivery['status']) => {
     setIsUpdating(true);
     try {
-      console.log('Updating delivery status:', deliveryId, newStatus);
-      // In real app, call API here
-      setTimeout(() => {
-        alert(`Delivery status updated to: ${newStatus}`);
+      const numeric = parseInt(String(deliveryId).replace(/\D/g, ''), 10);
+      if (Number.isNaN(numeric)) {
+        // unable to parse numeric id from route, skip API call and update locally
         setSelectedStatus(newStatus);
-        setIsUpdating(false);
-      }, 1000);
+        setDelivery({ ...delivery, status: newStatus });
+      } else {
+        const updated = await updateTransportStatus(numeric, newStatus as unknown as import('../data/types').TransportStatus);
+        setSelectedStatus((updated as unknown as Delivery).status);
+        setDelivery(updated as unknown as Delivery);
+      }
+      alert(`Delivery status updated to: ${newStatus}`);
     } catch (error) {
       alert('Failed to update status');
       setIsUpdating(false);
     }
   };
 
-  const getNextStatus = (): string | null => {
+  const getNextStatus = (): Delivery['status'] | null => {
     switch (delivery.status) {
       case 'Loading':
         return 'Transporting';
@@ -87,7 +132,21 @@ export function DriverDeliveryDetailPage() {
             <div className="bg-white rounded-lg border border-[#DADAD3] p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-xl font-semibold text-[#1A1C18]">Delivery Details</h2>
-                <StatusBadge status={delivery.status as any} />
+                {(() => {
+                  const variant =
+                    delivery.status === 'Loading'
+                      ? 'loading'
+                      : delivery.status === 'Transporting'
+                      ? 'transporting'
+                      : delivery.status === 'Arrived'
+                      ? 'arrived'
+                      : delivery.approvalStatus === 'Approved'
+                      ? 'approved'
+                      : delivery.approvalStatus === 'Rejected'
+                      ? 'rejected'
+                      : 'pending';
+                  return <StatusBadge status={variant} />;
+                })()}
               </div>
 
               <div className="grid grid-cols-2 gap-6">

@@ -1,6 +1,7 @@
 'use client';
 
 import { Delivery } from '../types';
+import type { StatusVariant } from './StatusBadge';
 import { formatDate, getStatusLabel } from '../deliveryUtils';
 import { StatusBadge } from './StatusBadge';
 
@@ -23,7 +24,23 @@ export function DeliveryCard({ delivery, onClick, showActions }: DeliveryCardPro
           </h3>
           <p className="text-sm text-gray-600 mt-1">{delivery.plantationName}</p>
         </div>
-        <StatusBadge status={delivery.status as any} />
+        {
+          (() => {
+            const variant: StatusVariant =
+              delivery.status === 'Loading'
+                ? 'loading'
+                : delivery.status === 'Transporting'
+                ? 'transporting'
+                : delivery.status === 'Arrived'
+                ? 'arrived'
+                : delivery.approvalStatus === 'Approved'
+                ? 'approved'
+                : delivery.approvalStatus === 'Rejected'
+                ? 'rejected'
+                : 'pending';
+            return <StatusBadge status={variant} />;
+          })()
+        }
       </div>
 
       <div className="space-y-2 mb-4 text-sm">

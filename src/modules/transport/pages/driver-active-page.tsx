@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getDeliveriesByDriver } from '../mockData';
+import { getDriverDeliveries } from '../data/transport-api';
 import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
 import { DeliveryCard } from '../components/DeliveryCard';
 import { isDeliveryInTransit } from '../deliveryUtils';
@@ -11,7 +12,31 @@ import Link from 'next/link';
 export function DriverActiveDeliveriesPage() {
   // Mock driver ID - in real app, get from auth context
   const driverId = 'driver-001';
-  const allDeliveries = getDeliveriesByDriver(driverId);
+  const [allDeliveries, setAllDeliveries] = useState<Delivery[]>(() => getDeliveriesByDriver(driverId) as Delivery[]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await getDriverDeliveries(driverId);
+        if (!mounted) return;
+        setAllDeliveries(res as unknown as Delivery[]);
+      } catch (err) {
+        console.warn('Driver deliveries API failed, using mock data', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [driverId]);
 
   // Separate active from completed
   const activeDeliveries = allDeliveries.filter(

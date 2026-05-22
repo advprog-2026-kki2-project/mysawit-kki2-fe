@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye } from 'lucide-react';
 import { getDeliveriesByForeman } from '../mockData';
+import { getForemanApprovedDeliveries } from '../data/transport-api';
 import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
 import { DeliveryCard } from '../components/DeliveryCard';
 import type { Delivery } from '../types';
@@ -11,9 +12,38 @@ import Link from 'next/link';
 export function ForemanDeliveriesPage() {
   // Mock foreman ID - in real app, get from auth context
   const foremanId = 'foreman-001';
-  const deliveries = getDeliveriesByForeman(foremanId);
+  const [deliveries, setDeliveries] = useState<Delivery[]>(() =>
+    getDeliveriesByForeman(foremanId) as Delivery[],
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const { filteredDeliveries, searchTerm, setSearchTerm, filters, setFilters } =
     useDeliveryFilters(deliveries as Delivery[]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await getForemanApprovedDeliveries();
+        if (!mounted) return;
+        // filter by foreman if API returns global list
+        const list = (res as unknown as Delivery[]).filter((d) => d.foremanId === foremanId);
+        setDeliveries(list);
+      } catch (err) {
+        console.warn('Foreman deliveries API failed, using mock data', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [foremanId]);
 
   return (
     <div className="min-h-screen bg-[#FFFFF1]">
@@ -51,7 +81,7 @@ export function ForemanDeliveriesPage() {
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    status: (e.target.value as any) || undefined,
+                    status: (e.target.value as unknown as Delivery['status']) || undefined,
                   })
                 }
                 className="w-full px-4 py-2 border border-[#DADAD3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#415B2B]"
@@ -72,7 +102,7 @@ export function ForemanDeliveriesPage() {
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    approvalStatus: (e.target.value as any) || undefined,
+                    approvalStatus: (e.target.value as unknown as Delivery['approvalStatus']) || undefined,
                   })
                 }
                 className="w-full px-4 py-2 border border-[#DADAD3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#415B2B]"

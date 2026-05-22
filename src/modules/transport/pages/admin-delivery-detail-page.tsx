@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { getDeliveryById } from '../mockData';
+import { getTransportById } from '../data/transport-api';
 import { StatusTimeline } from '../components/StatusTimeline';
 import { StatusBadge } from '../components/StatusBadge';
 import { RejectModal } from '../components/RejectModal';
@@ -16,12 +17,38 @@ export function AdminDeliveryDetailPage() {
   const router = useRouter();
   const deliveryId = params.id as string;
 
-  const delivery = getDeliveryById(deliveryId);
+  const [delivery, setDelivery] = useState<Delivery>(() =>
+    getDeliveryById(deliveryId) as Delivery,
+  );
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isPartialReject, setIsPartialReject] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!delivery) {
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const t = await getTransportById(deliveryId);
+        if (!mounted) return;
+        setDelivery(t as unknown as Delivery);
+      } catch (err) {
+        const fallback = getDeliveryById(deliveryId);
+        if (!fallback) setError('Failed to load delivery from server.');
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [deliveryId]);
+
+  if (!delivery && !isLoading) {
     return (
       <div className="min-h-screen bg-[#FFFFF1] flex items-center justify-center">
         <div className="text-center">
@@ -30,6 +57,20 @@ export function AdminDeliveryDetailPage() {
             href="/transport/admin/deliveries"
             className="text-[#415B2B] hover:underline"
           >
+            Back to deliveries
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FFFFF1] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[#1A1C18] mb-4">Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Link href="/transport/admin/deliveries" className="text-[#415B2B] hover:underline">
             Back to deliveries
           </Link>
         </div>
@@ -105,7 +146,21 @@ export function AdminDeliveryDetailPage() {
             <div className="bg-white rounded-lg border border-[#DADAD3] p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-xl font-semibold text-[#1A1C18]">Delivery Overview</h2>
-                <StatusBadge status={delivery.status as any} />
+                {(() => {
+                  const variant =
+                    delivery.status === 'Loading'
+                      ? 'loading'
+                      : delivery.status === 'Transporting'
+                      ? 'transporting'
+                      : delivery.status === 'Arrived'
+                      ? 'arrived'
+                      : delivery.approvalStatus === 'Approved'
+                      ? 'approved'
+                      : delivery.approvalStatus === 'Rejected'
+                      ? 'rejected'
+                      : 'pending';
+                  return <StatusBadge status={variant} />;
+                })()}
               </div>
 
               <div className="grid grid-cols-2 gap-6 mb-6">
@@ -256,7 +311,21 @@ export function AdminDeliveryDetailPage() {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Delivery Status</p>
-                  <StatusBadge status={delivery.status as any} />
+                    {(() => {
+                      const variant =
+                        delivery.status === 'Loading'
+                          ? 'loading'
+                          : delivery.status === 'Transporting'
+                          ? 'transporting'
+                          : delivery.status === 'Arrived'
+                          ? 'arrived'
+                          : delivery.approvalStatus === 'Approved'
+                          ? 'approved'
+                          : delivery.approvalStatus === 'Rejected'
+                          ? 'rejected'
+                          : 'pending';
+                      return <StatusBadge status={variant} />;
+                    })()}
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mt-4">Admin Review</p>

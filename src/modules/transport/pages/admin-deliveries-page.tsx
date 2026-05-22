@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { getApprovedDeliveries, mockDeliveries } from '../mockData';
+import { useState, useEffect } from 'react';
+import { mockDeliveries } from '../mockData';
+import { getOngoingDeliveries, getForemanApprovedDeliveries } from '../data/transport-api';
 import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
 import { DeliveryCard } from '../components/DeliveryCard';
 import type { Delivery } from '../types';
@@ -9,13 +10,44 @@ import Link from 'next/link';
 import { Calendar, Search } from 'lucide-react';
 
 export function AdminDeliveriesPage() {
-  const deliveries = mockDeliveries; // Admin sees all deliveries
+  const [deliveries, setDeliveries] = useState<Delivery[]>(() => mockDeliveries as Delivery[]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const { filteredDeliveries, searchTerm, setSearchTerm, filters, setFilters } =
     useDeliveryFilters(deliveries as Delivery[]);
 
   const approvedCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Approved').length;
   const rejectedCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Rejected').length;
   const pendingCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Pending').length;
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // prefer ongoing + foreman-approved combined
+        const ongoing = await getOngoingDeliveries();
+        const approved = await getForemanApprovedDeliveries();
+        if (!mounted) return;
+        const merged = [...(ongoing as unknown as Delivery[]), ...(approved as unknown as Delivery[])];
+        // dedupe by id
+        const byId = new Map<string, Delivery>();
+        merged.forEach((d) => byId.set(d.id, d));
+        setDeliveries(Array.from(byId.values()));
+      } catch (err) {
+        console.warn('Admin deliveries API failed, using mock data', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FFFFF1]">
@@ -72,7 +104,7 @@ export function AdminDeliveriesPage() {
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    approvalStatus: (e.target.value as any) || undefined,
+                    approvalStatus: (e.target.value as unknown as Delivery['approvalStatus']) || undefined,
                   })
                 }
                 className="w-full px-4 py-2 border border-[#DADAD3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#415B2B]"
@@ -93,7 +125,7 @@ export function AdminDeliveriesPage() {
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    status: (e.target.value as any) || undefined,
+                    status: (e.target.value as unknown as Delivery['status']) || undefined,
                   })
                 }
                 className="w-full px-4 py-2 border border-[#DADAD3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#415B2B]"
