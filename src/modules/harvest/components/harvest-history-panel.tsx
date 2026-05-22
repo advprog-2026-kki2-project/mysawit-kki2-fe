@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { ApiError } from "@/modules/auth/data/auth-api";
 import { getLaborerHarvestHistory } from "@/modules/harvest/data/harvest-api";
+import { HarvestPhotoThumb } from "@/modules/harvest/components/harvest-photo-thumb";
 import type { HarvestRecord } from "@/modules/harvest/data/types";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,10 @@ function formatKg(weightKg: number) {
   return new Intl.NumberFormat("id-ID", {
     maximumFractionDigits: 2,
   }).format(weightKg);
+}
+
+function photoPathsOf(record: HarvestRecord) {
+  return record.photoPaths?.length ? record.photoPaths : record.photoPath ? [record.photoPath] : [];
 }
 
 export function HarvestHistoryPanel({
@@ -132,9 +137,10 @@ export function HarvestHistoryPanel({
       ) : null}
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[42rem] text-left text-sm">
+        <table className="w-full min-w-[50rem] text-left text-sm">
           <thead className="bg-[#f4f4ed] text-xs uppercase tracking-[0.01em] text-[#74796d]">
             <tr>
+              <th className="px-5 py-3 font-bold">Photo</th>
               <th className="px-5 py-3 font-bold">Date</th>
               <th className="px-5 py-3 font-bold">Notes</th>
               <th className="px-5 py-3 text-right font-bold">Weight (kg)</th>
@@ -144,13 +150,24 @@ export function HarvestHistoryPanel({
           <tbody className="divide-y divide-[#c4c8ba]/60">
             {records.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-5 py-8 text-center text-[#74796d]">
+                <td colSpan={5} className="px-5 py-8 text-center text-[#74796d]">
                   Belum ada riwayat panen.
                 </td>
               </tr>
             ) : (
               records.map((record) => (
                 <tr key={record.id}>
+                  <td className="w-32 px-5 py-4">
+                    {photoPathsOf(record).length ? (
+                      <HarvestPhotoThumb
+                        record={record}
+                        scope="laborer"
+                        className="h-20 w-28 min-h-0"
+                      />
+                    ) : (
+                      <span className="text-xs text-[#74796d]">Tidak ada foto</span>
+                    )}
+                  </td>
                   <td className="whitespace-nowrap px-5 py-4 font-semibold text-[#1a1c18]">
                     {formatDate(record.harvestDate)}
                   </td>
