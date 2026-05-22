@@ -145,7 +145,7 @@ export function LoginForm() {
     <div className="space-y-6">
       <div>
         <p className="mono-label text-[#74796d]">Masuk</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Masuk ke akun Anda.
         </h2>
         <p className="mt-3 text-sm leading-7 text-[#44483e]">
