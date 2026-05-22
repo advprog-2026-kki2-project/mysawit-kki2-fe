@@ -1,5 +1,6 @@
 import { requestJson } from "@/lib/api-client";
 import type {
+  ApprovedHarvestPickup,
   PickupPayload,
   Transport,
   TransportStatus,
@@ -10,6 +11,17 @@ export function assignPickup(payload: PickupPayload) {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export function getAvailablePickups(filters?: { laborerName?: string }) {
+  const params = new URLSearchParams();
+  if (filters?.laborerName?.trim()) params.set("laborerName", filters.laborerName.trim());
+  const query = params.toString();
+
+  return requestJson<ApprovedHarvestPickup[]>(
+    `/api/transport/available-pickups${query ? `?${query}` : ""}`,
+    { method: "GET" },
+  );
 }
 
 export function getDriverDeliveries(driverId: string) {

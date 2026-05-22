@@ -211,7 +211,7 @@ function ActionQueue({
           Perlu Ditindaklanjuti
         </h2>
         <p className="mt-1 text-sm text-[#74796d]">
-          Prioritas pendek dari data backend sesuai akses {roleLabels[session.role]}.
+          Prioritas pendek dari data backend sesuai akses aktif.
         </p>
       </div>
 
@@ -247,22 +247,21 @@ function TeamSnapshot({
   session: AuthResponse;
 }) {
   const canManageUsers = session.role === "ADMIN";
-  const rows =
-    data.users.length > 0
-      ? data.users.slice(0, 5).map((user) => ({
-          email: user.email,
-          name: user.username,
-          role: roleLabels[user.role],
-          status: user.role === "ADMIN" ? "Admin" : "Aktif",
-        }))
-      : [
-          {
-            email: "Sesi aktif",
-            name: session.username,
-            role: roleLabels[session.role],
-            status: "Aktif",
-          },
-        ];
+  const rows = data.users.slice(0, 5).map((user) => ({
+    email: user.email,
+    name: user.username,
+    role: roleLabels[user.role],
+    status: user.role === "ADMIN" ? "Admin" : "Aktif",
+  }));
+
+  if (!canManageUsers && rows.length === 0) {
+    rows.push({
+      email: "Sesi aktif",
+      name: session.username,
+      role: roleLabels[session.role],
+      status: "Aktif",
+    });
+  }
 
   return (
     <section className="overflow-hidden rounded-lg border border-[#c4c8ba]/70 bg-white shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
@@ -301,37 +300,43 @@ function TeamSnapshot({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[42rem] text-left text-sm">
-          <thead className="bg-[#f4f4ed] text-xs uppercase tracking-[0.01em] text-[#74796d]">
-            <tr>
-              <th className="px-5 py-3 font-bold">Nama</th>
-              <th className="px-5 py-3 font-bold">Email</th>
-              <th className="px-5 py-3 font-bold">Role</th>
-              <th className="px-5 py-3 font-bold">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#c4c8ba]/60">
-            {rows.map((user) => (
-              <tr key={`${user.email}-${user.name}`}>
-                <td className="px-5 py-4 font-semibold text-[#1a1c18]">
-                  {user.name}
-                </td>
-                <td className="px-5 py-4 text-[#44483e]">{user.email}</td>
-                <td className="px-5 py-4">
-                  <Badge variant="muted" className="normal-case">
-                    {user.role}
-                  </Badge>
-                </td>
-                <td className="px-5 py-4">
-                  <span className="inline-flex items-center gap-2 font-medium text-[#1a1c18]">
-                    <span className="size-2 rounded-full bg-[#2b4316]" />
-                    {user.status}
-                  </span>
-                </td>
+        {rows.length > 0 ? (
+          <table className="w-full min-w-[42rem] text-left text-sm">
+            <thead className="bg-[#f4f4ed] text-xs uppercase tracking-[0.01em] text-[#74796d]">
+              <tr>
+                <th className="px-5 py-3 font-bold">Nama</th>
+                <th className="px-5 py-3 font-bold">Email</th>
+                <th className="px-5 py-3 font-bold">Role</th>
+                <th className="px-5 py-3 font-bold">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#c4c8ba]/60">
+              {rows.map((user) => (
+                <tr key={`${user.email}-${user.name}`}>
+                  <td className="px-5 py-4 font-semibold text-[#1a1c18]">
+                    {user.name}
+                  </td>
+                  <td className="px-5 py-4 text-[#44483e]">{user.email}</td>
+                  <td className="px-5 py-4">
+                    <Badge variant="muted" className="normal-case">
+                      {user.role}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="inline-flex items-center gap-2 font-medium text-[#1a1c18]">
+                      <span className="size-2 rounded-full bg-[#2b4316]" />
+                      {user.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="px-5 py-8 text-sm text-[#74796d]">
+            Belum ada user operasional yang ditampilkan.
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-4 border-t border-[#c4c8ba]/70 px-5 py-4">

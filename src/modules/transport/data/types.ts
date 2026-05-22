@@ -24,6 +24,7 @@ export type Transport = {
   id: number;
   driverId: string;
   foremanName: string;
+  harvestIds: string[];
   totalWeight: number;
   status: TransportStatus;
   createdAt: string | null;
@@ -39,4 +40,10 @@ export type PickupPayload = {
   driverId: string;
   foremanName: string;
   harvestIds: string[];
+};
+
+export type ApprovedHarvestPickup = {
+  harvestId: string;
+  laborerName: string;
+  weightKg: number;
 };

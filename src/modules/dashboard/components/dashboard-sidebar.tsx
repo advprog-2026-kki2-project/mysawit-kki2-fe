@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -21,7 +20,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { ApiError, logout } from "@/modules/auth/data/auth-api";
-import { roleLabels, type AuthResponse } from "@/modules/auth/data/types";
+import type { AuthResponse } from "@/modules/auth/data/types";
 import { getNavigationForRole } from "@/modules/dashboard/data/navigation";
 
 type DashboardSidebarProps = {
@@ -101,15 +100,7 @@ export function DashboardSidebar({ session }: DashboardSidebarProps) {
 
       <SidebarSeparator className="bg-transparent" />
 
-      <SidebarFooter className="px-5 pb-5">
-        <div className="rounded-lg border border-[#c4c8ba] bg-[#fafaf2] px-4 py-4 group-data-[collapsible=icon]:hidden">
-          <p className="truncate text-sm font-semibold text-[#1a1c18]">
-            {session.username}
-          </p>
-          <p className="mt-1 text-xs text-[#74796d]">
-            {roleLabels[session.role]}
-          </p>
-        </div>
+      <div className="px-5 pb-5">
         <Button
           type="button"
           variant="ghost"
@@ -123,7 +114,7 @@ export function DashboardSidebar({ session }: DashboardSidebarProps) {
             {isLoggingOut ? "Logout..." : "Logout"}
           </span>
         </Button>
-      </SidebarFooter>
+      </div>
     </Sidebar>
   );
 }

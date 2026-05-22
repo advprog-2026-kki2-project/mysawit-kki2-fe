@@ -8,7 +8,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { roleLabels, type AuthResponse } from "@/modules/auth/data/types";
+import type { AuthResponse } from "@/modules/auth/data/types";
 import { DashboardSidebar } from "@/modules/dashboard/components/dashboard-sidebar";
 
 type DashboardShellProps = {
@@ -19,30 +19,6 @@ type DashboardShellProps = {
   children: ReactNode;
 };
 
-function DefaultDashboardAside({ session }: { session: AuthResponse }) {
-  return (
-    <section className="rounded-lg border border-[#c4c8ba]/70 bg-white p-5 shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
-      <h2 className="font-[var(--font-syne)] text-lg font-bold text-[#1a1c18]">
-        Akun
-      </h2>
-      <dl className="mt-4 space-y-4 text-sm">
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-[#74796d]">Username</dt>
-          <dd className="truncate font-semibold text-[#1a1c18]">
-            {session.username}
-          </dd>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-[#74796d]">Role</dt>
-          <dd className="font-semibold text-[#2b4316]">
-            {roleLabels[session.role]}
-          </dd>
-        </div>
-      </dl>
-    </section>
-  );
-}
-
 export function DashboardShell({
   session,
   title,
@@ -50,8 +26,7 @@ export function DashboardShell({
   aside,
   children,
 }: DashboardShellProps) {
-  const displayInitial = session.username.slice(0, 1).toUpperCase();
-  const shouldRenderAside = aside !== null;
+  const shouldRenderAside = aside != null;
 
   return (
     <SidebarProvider className="min-h-svh bg-[#dadad3]">
@@ -87,15 +62,6 @@ export function DashboardShell({
                 <Bell className="size-4" />
               </button>
             </div>
-
-            <div className="flex min-w-0 items-center gap-3 rounded-lg border border-[#c4c8ba] bg-white px-2 py-2 sm:px-3">
-              <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#cdedae] text-sm font-semibold text-[#415b2b]">
-                {displayInitial}
-              </span>
-              <span className="hidden max-w-32 truncate text-sm font-semibold text-[#1a1c18] lg:block">
-                {session.username}
-              </span>
-            </div>
           </div>
         </header>
 
@@ -109,9 +75,6 @@ export function DashboardShell({
           <section className="min-w-0 space-y-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.01em] text-[#74796d]">
-                  {roleLabels[session.role]}
-                </p>
                 <h1 className="font-[var(--font-syne)] truncate text-2xl font-bold text-[#1a1c18] sm:text-3xl">
                   {title}
                 </h1>
@@ -128,7 +91,7 @@ export function DashboardShell({
 
           {shouldRenderAside ? (
             <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
-              {aside ?? <DefaultDashboardAside session={session} />}
+              {aside}
             </aside>
           ) : null}
         </main>
