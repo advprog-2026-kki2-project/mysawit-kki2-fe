@@ -6,9 +6,11 @@ import {
   Calculator,
   Check,
   CreditCard,
+  ExternalLink,
   Filter,
   History,
   Hourglass,
+  LoaderCircle,
   RefreshCcw,
   Save,
   Scale,
@@ -34,6 +36,7 @@ import { ApiError } from "@/modules/auth/data/auth-api";
 import type { AuthResponse, Role } from "@/modules/auth/data/types";
 import {
   acceptPayroll,
+  createXenditTopUp,
   getWallet,
   getWalletTransactions,
   getPayrolls,
@@ -45,10 +48,12 @@ import {
 import {
   payrollStatusLabels,
   payrollStatusOptions,
+  xenditTopUpStatusLabels,
   type Payroll,
   type PayrollStatus,
   type Wallet,
   type WalletTransaction,
+  type XenditWalletTopUp,
 } from "@/modules/payroll/data/types";
 
 type PayrollManagerProps = {
@@ -107,11 +112,14 @@ export function PayrollManager({ session }: PayrollManagerProps) {
   const [foremanWage, setForemanWage] = useState("");
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [latestXenditTopUp, setLatestXenditTopUp] =
+    useState<XenditWalletTopUp | null>(null);
   const [topUpAmount, setTopUpAmount] = useState("");
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingTopUp, setIsCreatingTopUp] = useState(false);
   const pendingPayrolls = payrolls.filter((payroll) => payroll.status === "PENDING");
   const acceptedPayrolls = payrolls.filter((payroll) => payroll.status === "ACCEPTED");
   const rejectedPayrolls = payrolls.filter((payroll) => payroll.status === "REJECTED");
@@ -235,13 +243,39 @@ export function PayrollManager({ session }: PayrollManagerProps) {
   async function handleTopUp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isAdmin) return;
+    setFeedback(null);
+    setError(null);
+    setIsCreatingTopUp(true);
+    try {
+      const payment = await createXenditTopUp(Number(topUpAmount));
+      setLatestXenditTopUp(payment);
+      setTopUpAmount("");
+      setFeedback("Invoice Xendit dibuat. Anda akan diarahkan ke halaman pembayaran.");
+      if (!payment.invoiceUrl) {
+        throw new Error("Invoice URL Xendit tidak tersedia.");
+      }
+      window.location.assign(payment.invoiceUrl);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Top up gagal diproses.");
+    } finally {
+      setIsCreatingTopUp(false);
+    }
+  }
+
+  async function handleManualTopUp() {
+    if (!isAdmin) return;
+    setFeedback(null);
+    setError(null);
+    setIsCreatingTopUp(true);
     try {
       await topUpWallet(Number(topUpAmount));
       setTopUpAmount("");
-      setFeedback("Saldo wallet berhasil ditambahkan melalui sandbox gateway.");
+      setFeedback("Saldo wallet berhasil ditambahkan secara manual.");
       await loadWallet();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Top up gagal diproses.");
+      setError(caughtError instanceof Error ? caughtError.message : "Top up manual gagal diproses.");
+    } finally {
+      setIsCreatingTopUp(false);
     }
   }
 
@@ -584,10 +618,43 @@ export function PayrollManager({ session }: PayrollManagerProps) {
                 className="border-white/20 bg-white text-[#1a1c18]"
                 required
               />
-              <Button type="submit" className="w-full border-white bg-white text-[#0f3d2e] hover:bg-[#cdedae]">
-                <CreditCard className="size-4" />
-                Top Up Balance
+              <Button
+                type="submit"
+                className="w-full border-white bg-white text-[#0f3d2e] hover:bg-[#cdedae]"
+                disabled={isCreatingTopUp}
+              >
+                {isCreatingTopUp ? <LoaderCircle className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+                Pay with Xendit
               </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                disabled={isCreatingTopUp || !topUpAmount}
+                onClick={() => void handleManualTopUp()}
+              >
+                <WalletCards className="size-4" />
+                Manual Top Up
+              </Button>
+              {latestXenditTopUp ? (
+                <div className="rounded-lg bg-white/10 p-3 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-semibold text-[#a8c7b4]">Xendit Invoice</span>
+                    <Badge variant="default" className="bg-[#cdedae] text-[#2b4316]">
+                      {xenditTopUpStatusLabels[latestXenditTopUp.status]}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 font-bold">{formatRupiah(latestXenditTopUp.rupiahAmount)}</p>
+                  {latestXenditTopUp.invoiceUrl ? (
+                    <a
+                      href={latestXenditTopUp.invoiceUrl}
+                      className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-[#cdedae] underline-offset-4 hover:underline"
+                    >
+                      Continue payment <ExternalLink className="size-3" />
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
             </form>
           ) : null}
         </section>

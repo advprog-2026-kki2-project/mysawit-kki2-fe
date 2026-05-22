@@ -48,6 +48,30 @@ export type WalletTransaction = {
   createdAt: string;
 };
 
+export const xenditTopUpStatusLabels = {
+  PENDING: "Pending",
+  PAID: "Paid",
+  EXPIRED: "Expired",
+  FAILED: "Failed",
+} as const;
+
+export type XenditTopUpStatus = keyof typeof xenditTopUpStatusLabels;
+
+export type XenditWalletTopUp = {
+  id: string;
+  externalId: string;
+  xenditInvoiceId: string | null;
+  status: XenditTopUpStatus;
+  walletAmount: number;
+  rupiahAmount: number;
+  invoiceUrl: string | null;
+  expiresAt: string | null;
+  paidAt: string | null;
+  creditedAt: string | null;
+  paymentMethod: string | null;
+  paymentChannel: string | null;
+};
+
 export type WageConfiguration = {
   id: number;
   laborerWagePerKg: number;

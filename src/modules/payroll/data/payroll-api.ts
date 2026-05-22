@@ -6,6 +6,7 @@ import type {
   WalletTransaction,
   WageConfiguration,
   WageConfigurationPayload,
+  XenditWalletTopUp,
 } from "@/modules/payroll/data/types";
 
 export function getWageConfiguration() {
@@ -60,8 +61,21 @@ export function topUpWallet(amount: number) {
     method: "POST",
     body: JSON.stringify({
       amount,
-      gatewayReference: `SANDBOX-${Date.now()}`,
+      topUpReference: `MANUAL-${Date.now()}`,
     }),
+  });
+}
+
+export function createXenditTopUp(amount: number) {
+  return requestJson<XenditWalletTopUp>("/api/payment/wallet/top-up/xendit", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export function getXenditTopUp(paymentId: string) {
+  return requestJson<XenditWalletTopUp>(`/api/payment/wallet/top-up/xendit/${paymentId}`, {
+    method: "GET",
   });
 }
 
