@@ -113,6 +113,8 @@ export function PlantationManager() {
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [selectedPlantation, setSelectedPlantation] = useState<Plantation | null>(null);
   const [driverSearchQuery, setDriverSearchQuery] = useState("");
@@ -173,6 +175,7 @@ export function PlantationManager() {
     setEditingPlantationId(null);
     setOverlapMessage(null);
     setHasOverlap(false);
+    setIsFormOpen(false);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -335,10 +338,25 @@ export function PlantationManager() {
             size="sm"
             onClick={() => void loadPlantations(filterName, filterCode, filterForemanId)}
             disabled={isFetching}
-            className="border-[#DADAD3] text-[#3D4038] hover:bg-[#FDFBEA]"
+            className="border-[#DADAD3] text-[#3D4038] hover:bg-[#FDFBEA] h-9"
           >
             <RefreshCw className={`size-3.5 ${isFetching ? "animate-spin" : ""}`} />
             Refresh
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              if (isFormOpen) {
+                resetForm();
+              } else {
+                setIsFormOpen(true);
+              }
+            }}
+            className="bg-[#415B2B] text-[#FFFFF1] hover:bg-[#314A21] border-[#415B2B] h-9 gap-1 font-bold"
+          >
+            <Plus className={`size-4 transition-transform duration-200 ${isFormOpen ? "rotate-45" : ""}`} />
+            {isFormOpen ? "Close Form" : "Register Plantation"}
           </Button>
         </div>
       </div>
@@ -404,297 +422,294 @@ export function PlantationManager() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] items-start">
-        {/* Left Column: Form & Real-time Visualizer */}
-        <section className="border border-[#E8E8DF] bg-[#FDFBEA] shadow-[0_2px_8px_rgba(26,28,24,0.05)] rounded-[2rem] p-6 sm:p-8 space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <span className="mono-label text-[#415B2B] text-xs font-bold uppercase tracking-wider">Plantation Form</span>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#1A1C18]">
-                {editingPlantationId ? "Edit Plantation" : "Add Plantation"}
-              </h2>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#3D4038]">
-                Fill in the name, code, area, and four corner coordinates of the plantation.
-              </p>
-            </div>
-            {editingPlantationId && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-                className="text-[#774E15] hover:bg-[#F3E7D2] hover:text-[#774E15]"
-              >
-                Cancel Edit
-              </Button>
-            )}
-          </div>
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-code">
-                Plantation Code <span className="text-[#BA1A1A]">*</span>
-              </label>
-              <Input
-                id="plantation-code"
-                value={formState.plantationCode}
-                onChange={(event) =>
-                  setFormState((current) => ({
-                    ...current,
-                    plantationCode: event.target.value,
-                  }))
-                }
-                placeholder="Example: PLT-YYYYMMDD-XXXX"
-                disabled={Boolean(editingPlantationId)}
-                required
-                className="h-11 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
-              />
-              <p className="text-[11px] text-[#5F6358]">
-                Unique code to identify the plantation. Cannot be changed after creation.
-              </p>
+      <div className="flex flex-col gap-6">
+        {isFormOpen && (
+          <section className="border border-[#E8E8DF] bg-[#FDFBEA] shadow-[0_2px_8px_rgba(26,28,24,0.05)] rounded-[2rem] p-6 sm:p-8 space-y-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <span className="mono-label text-[#415B2B] text-xs font-bold uppercase tracking-wider">Plantation Form</span>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#1A1C18]">
+                  {editingPlantationId ? "Edit Plantation" : "Add Plantation"}
+                </h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-[#3D4038]">
+                  Fill in the name, code, area, and four corner coordinates of the plantation.
+                </p>
+              </div>
+              {editingPlantationId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetForm}
+                  className="text-[#774E15] hover:bg-[#F3E7D2] hover:text-[#774E15]"
+                >
+                  Cancel Edit
+                </Button>
+              )}
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-name">
-                Plantation Name <span className="text-[#BA1A1A]">*</span>
-              </label>
-              <Input
-                id="plantation-name"
-                value={formState.plantationName}
-                onChange={(event) =>
-                  setFormState((current) => ({
-                    ...current,
-                    plantationName: event.target.value,
-                  }))
-                }
-                placeholder="Example: Kebun Sejahtera Blok B"
-                required
-                className="h-11 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="area-hectares">
-                Area Size (Hectares) <span className="text-[#BA1A1A]">*</span>
-              </label>
-              <div className="relative">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-code">
+                  Plantation Code <span className="text-[#BA1A1A]">*</span>
+                </label>
                 <Input
-                  id="area-hectares"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formState.areaHectares}
+                  id="plantation-code"
+                  value={formState.plantationCode}
                   onChange={(event) =>
                     setFormState((current) => ({
                       ...current,
-                      areaHectares: event.target.value,
+                      plantationCode: event.target.value,
                     }))
                   }
-                  placeholder="24.5"
+                  placeholder="Example: PLT-YYYYMMDD-XXXX"
+                  disabled={Boolean(editingPlantationId)}
                   required
-                  className="h-11 pr-14 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
+                  className="h-11 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
                 />
-                <span className="absolute right-3.5 top-2.5 text-sm font-semibold text-[#5F6358]">
-                  Ha
-                </span>
-              </div>
-            </div>
-
-            {/* Corner Coordinates Input Section */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
-                  Corner Coordinates (4 Points) <span className="text-[#BA1A1A]">*</span>
-                </label>
-                <span className="text-[11px] text-[#5F6358]">2D numerical values</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {formState.corners.map((corner, index) => (
-                  <div
-                    key={`corner-input-${index}`}
-                    className="rounded-xl border border-[#E8E8DF] bg-white p-3.5 shadow-[0_1px_3px_rgba(26,28,24,0.02)]"
-                  >
-                    <span className="text-[11px] font-bold text-[#415B2B] uppercase tracking-wider">
-                      Corner Point {index + 1}
-                    </span>
-                    <div className="mt-2.5 grid gap-2 grid-cols-2">
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={corner.x}
-                          onChange={(event) =>
-                            setFormState((current) => ({
-                              ...current,
-                              corners: current.corners.map((item, itemIndex) =>
-                                itemIndex === index
-                                  ? { ...item, x: event.target.value }
-                                  : item,
-                              ),
-                            }))
-                          }
-                          placeholder="Absis X"
-                          required
-                          className="h-9 px-2 text-center text-xs rounded-md border-[#DADAD3]"
-                        />
-                      </div>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={corner.y}
-                          onChange={(event) =>
-                            setFormState((current) => ({
-                              ...current,
-                              corners: current.corners.map((item, itemIndex) =>
-                                itemIndex === index
-                                  ? { ...item, y: event.target.value }
-                                  : item,
-                              ),
-                            }))
-                          }
-                          placeholder="Ordinat Y"
-                          required
-                          className="h-9 px-2 text-center text-xs rounded-md border-[#DADAD3]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Embed real-time visualizer mapping */}
-            <div className="space-y-2 pt-2 border-t border-[#E8E8DF]">
-              <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
-                Preview Grid Map
-              </label>
-              <CoordinateVisualizer
-                plantations={plantations}
-                currentCorners={formState.corners}
-                editingId={editingPlantationId}
-                onOverlapChange={(overlap, msg) => {
-                  setHasOverlap(overlap);
-                  setOverlapMessage(msg);
-                }}
-              />
-              {overlapMessage && (
-                <p className="mt-2 text-xs font-medium text-[#BA1A1A] bg-[#FFDAD6] p-2.5 rounded-lg border border-[#BA1A1A]/10">
-                  {overlapMessage}
+                <p className="text-[11px] text-[#5F6358]">
+                  Unique code to identify the plantation. Cannot be changed after creation.
                 </p>
-              )}
-            </div>
+              </div>
 
-            {/* Foreman & Drivers Assignment section */}
-            <div className="space-y-4 pt-4 border-t border-[#E8E8DF]">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-foreman">
-                  Select Foreman (Supervisor)
+                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-name">
+                  Plantation Name <span className="text-[#BA1A1A]">*</span>
                 </label>
-                <select
-                  id="plantation-foreman"
-                  value={formState.assignedForemanIds[0] || ""}
-                  onChange={(event) => {
-                    const val = event.target.value;
+                <Input
+                  id="plantation-name"
+                  value={formState.plantationName}
+                  onChange={(event) =>
                     setFormState((current) => ({
                       ...current,
-                      assignedForemanIds: val ? [val] : [],
-                    }));
-                  }}
-                  className="h-11 w-full rounded-lg border border-[#DADAD3] bg-white px-3 text-sm focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
-                >
-                  <option value="">-- Select Foreman (Optional) --</option>
-                  {allForemen.map((foreman) => (
-                    <option key={foreman.foremanId} value={foreman.foremanId}>
-                      {foreman.foremanName} ({foreman.employeeCode})
-                    </option>
-                  ))}
-                </select>
+                      plantationName: event.target.value,
+                    }))
+                  }
+                  placeholder="Example: Kebun Sejahtera Blok B"
+                  required
+                  className="h-11 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
+                />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
-                  Select Driver (Multiple selection allowed)
+                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="area-hectares">
+                  Area Size (Hectares) <span className="text-[#BA1A1A]">*</span>
                 </label>
-                <div className="rounded-xl border border-[#E8E8DF] bg-white p-3 max-h-[180px] overflow-y-auto space-y-2">
-                  {allDrivers.length === 0 ? (
-                    <p className="text-xs text-[#5F6358] text-center py-4">No drivers registered yet</p>
-                  ) : (
-                    allDrivers.map((driver) => {
-                      const isChecked = formState.assignedDriverIds.includes(driver.driverId);
-                      return (
-                        <label
-                          key={driver.driverId}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F3F8EC]/50 cursor-pointer transition-colors text-xs font-medium text-[#3D4038]"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-                              setFormState((current) => {
-                                const currentIds = current.assignedDriverIds;
-                                const newIds = checked
-                                  ? [...currentIds, driver.driverId]
-                                  : currentIds.filter((id) => id !== driver.driverId);
-                                return {
-                                  ...current,
-                                  assignedDriverIds: newIds,
-                                };
-                              });
-                            }}
-                            className="rounded border-[#DADAD3] text-[#415B2B] focus:ring-[#80B048]/20 h-4 w-4"
-                          />
-                          <div className="flex-1">
-                            <span className="font-semibold block">{driver.driverName}</span>
-                            <span className="text-[10px] text-[#5F6358]">License: {driver.licenseNumber}</span>
-                          </div>
-                        </label>
-                      );
-                    })
-                  )}
+                <div className="relative">
+                  <Input
+                    id="area-hectares"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formState.areaHectares}
+                    onChange={(event) =>
+                      setFormState((current) => ({
+                        ...current,
+                        areaHectares: event.target.value,
+                      }))
+                    }
+                    placeholder="24.5"
+                    required
+                    className="h-11 pr-14 rounded-lg border-[#DADAD3] bg-white placeholder-[#8A8D83] focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
+                  />
+                  <span className="absolute right-3.5 top-2.5 text-sm font-semibold text-[#5F6358]">
+                    Ha
+                  </span>
                 </div>
               </div>
-            </div>
 
-            <Button
-              className="w-full h-11 bg-[#415B2B] text-[#FFFFF1] hover:bg-[#314A21] rounded-lg font-sans font-bold transition-all mt-4"
-              type="submit"
-              disabled={isSubmitting || hasOverlap}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center gap-2 justify-center">
-                  <RefreshCw className="size-4 animate-spin" />
-                  Saving...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2 justify-center">
-                  <Plus className="size-4" />
-                  {editingPlantationId ? "Save Changes" : "Add Plantation"}
-                </span>
-              )}
-            </Button>
-          </form>
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
+                    Corner Coordinates (4 Points) <span className="text-[#BA1A1A]">*</span>
+                  </label>
+                  <span className="text-[11px] text-[#5F6358]">2D numerical values</span>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {formState.corners.map((corner, index) => (
+                    <div
+                      key={`corner-input-${index}`}
+                      className="rounded-xl border border-[#E8E8DF] bg-white p-3.5 shadow-[0_1px_3px_rgba(26,28,24,0.02)]"
+                    >
+                      <span className="text-[11px] font-bold text-[#415B2B] uppercase tracking-wider">
+                        Corner Point {index + 1}
+                      </span>
+                      <div className="mt-2.5 grid gap-2 grid-cols-2">
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={corner.x}
+                            onChange={(event) =>
+                              setFormState((current) => ({
+                                ...current,
+                                corners: current.corners.map((item, itemIndex) =>
+                                  itemIndex === index
+                                    ? { ...item, x: event.target.value }
+                                    : item,
+                                ),
+                              }))
+                            }
+                            placeholder="Absis X"
+                            required
+                            className="h-9 px-2 text-center text-xs rounded-md border-[#DADAD3]"
+                          />
+                        </div>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={corner.y}
+                            onChange={(event) =>
+                              setFormState((current) => ({
+                                ...current,
+                                corners: current.corners.map((item, itemIndex) =>
+                                  itemIndex === index
+                                    ? { ...item, y: event.target.value }
+                                    : item,
+                                ),
+                              }))
+                            }
+                            placeholder="Ordinat Y"
+                            required
+                            className="h-9 px-2 text-center text-xs rounded-md border-[#DADAD3]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          {feedback && (
-            <div
-              className={`rounded-xl border p-3.5 text-xs font-medium transition-all ${feedback.type === "success"
-                ? "border-[#2F7D4C]/25 bg-[#DAF1E3] text-[#2F7D4C]"
-                : "border-[#BA1A1A]/25 bg-[#FFDAD6] text-[#BA1A1A]"
-                }`}
-            >
-              {feedback.text}
-            </div>
-          )}
+              <div className="space-y-2 pt-2 border-t border-[#E8E8DF]">
+                <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
+                  Preview Grid Map
+                </label>
+                <CoordinateVisualizer
+                  plantations={plantations}
+                  currentCorners={formState.corners}
+                  editingId={editingPlantationId}
+                  onOverlapChange={(overlap, msg) => {
+                    setHasOverlap(overlap);
+                    setOverlapMessage(msg);
+                  }}
+                />
+                {overlapMessage && (
+                  <p className="mt-2 text-xs font-medium text-[#BA1A1A] bg-[#FFDAD6] p-2.5 rounded-lg border border-[#BA1A1A]/10">
+                    {overlapMessage}
+                  </p>
+                )}
+              </div>
 
-          {error && (
-            <div className="rounded-xl border border-[#BA1A1A]/25 bg-[#FFDAD6] px-4 py-3.5 text-xs text-[#BA1A1A] font-medium">
-              {error}
-            </div>
-          )}
-        </section>
+              <div className="space-y-4 pt-4 border-t border-[#E8E8DF]">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider" htmlFor="plantation-foreman">
+                    Select Foreman (Supervisor)
+                  </label>
+                  <select
+                    id="plantation-foreman"
+                    value={formState.assignedForemanIds[0] || ""}
+                    onChange={(event) => {
+                      const val = event.target.value;
+                      setFormState((current) => ({
+                        ...current,
+                        assignedForemanIds: val ? [val] : [],
+                      }));
+                    }}
+                    className="h-11 w-full rounded-lg border border-[#DADAD3] bg-white px-3 text-sm focus-visible:ring-[#80B048]/20 focus-visible:border-[#415B2B]"
+                  >
+                    <option value="">-- Select Foreman (Optional) --</option>
+                    {allForemen.map((foreman) => (
+                      <option key={foreman.foremanId} value={foreman.foremanId}>
+                        {foreman.foremanName} ({foreman.employeeCode})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Right Column: Displaying Plantations (Grid or Table) */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[#3D4038] uppercase tracking-wider">
+                    Select Driver (Multiple selection allowed)
+                  </label>
+                  <div className="rounded-xl border border-[#E8E8DF] bg-white p-3 max-h-[180px] overflow-y-auto space-y-2">
+                    {allDrivers.length === 0 ? (
+                      <p className="text-xs text-[#5F6358] text-center py-4">No drivers registered yet</p>
+                    ) : (
+                      allDrivers.map((driver) => {
+                        const isChecked = formState.assignedDriverIds.includes(driver.driverId);
+                        return (
+                          <label
+                            key={driver.driverId}
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F3F8EC]/50 cursor-pointer transition-colors text-xs font-medium text-[#3D4038]"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setFormState((current) => {
+                                  const currentIds = current.assignedDriverIds;
+                                  const newIds = checked
+                                    ? [...currentIds, driver.driverId]
+                                    : currentIds.filter((id) => id !== driver.driverId);
+                                  return {
+                                    ...current,
+                                    assignedDriverIds: newIds,
+                                  };
+                                });
+                              }}
+                              className="rounded border-[#DADAD3] text-[#415B2B] focus:ring-[#80B048]/20 h-4 w-4"
+                            />
+                            <div className="flex-1">
+                              <span className="font-semibold block">{driver.driverName}</span>
+                              <span className="text-[10px] text-[#5F6358]">License: {driver.licenseNumber}</span>
+                            </div>
+                          </label>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                className="w-full h-11 bg-[#415B2B] text-[#FFFFF1] hover:bg-[#314A21] rounded-lg font-sans font-bold transition-all mt-4"
+                type="submit"
+                disabled={isSubmitting || hasOverlap}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <RefreshCw className="size-4 animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2 justify-center">
+                    <Plus className="size-4" />
+                    {editingPlantationId ? "Save Changes" : "Add Plantation"}
+                  </span>
+                )}
+              </Button>
+            </form>
+
+            {feedback && (
+              <div
+                className={`rounded-xl border p-3.5 text-xs font-medium transition-all ${feedback.type === "success"
+                  ? "border-[#2F7D4C]/25 bg-[#DAF1E3] text-[#2F7D4C]"
+                  : "border-[#BA1A1A]/25 bg-[#FFDAD6] text-[#BA1A1A]"
+                  }`}
+              >
+                {feedback.text}
+              </div>
+            )}
+
+            {error && (
+              <div className="rounded-xl border border-[#BA1A1A]/25 bg-[#FFDAD6] px-4 py-3.5 text-xs text-[#BA1A1A] font-medium">
+                {error}
+              </div>
+            )}
+          </section>
+        )}
+
         <section className="space-y-4">
           {isFetching ? (
             <div className="space-y-4">
@@ -710,8 +725,7 @@ export function PlantationManager() {
               </p>
             </div>
           ) : viewMode === "grid" ? (
-            /* Grid View */
-            <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {plantations.map((plantation) => {
                 return (
                   <article
@@ -756,7 +770,6 @@ export function PlantationManager() {
                         </div>
                       </div>
 
-                      {/* Right Action buttons inside card */}
                       <div className="flex sm:flex-col gap-2 justify-end self-end sm:self-start" onClick={(e) => e.stopPropagation()}>
                         <Button
                           type="button"
@@ -765,6 +778,7 @@ export function PlantationManager() {
                           onClick={() => {
                             setEditingPlantationId(plantation.plantationId);
                             setFormState(toFormState(plantation));
+                            setIsFormOpen(true);
                             setFeedback(null);
                             setError(null);
                           }}
@@ -786,7 +800,6 @@ export function PlantationManager() {
                       </div>
                     </div>
 
-                    {/* Small visual thumbnail coordinates preview */}
                     <div className="mt-4 pt-3.5 border-t border-[#F0F0E8] flex items-center justify-between text-xs text-[#5F6358]">
                       <span className="flex items-center gap-1">
                         <MapPin className="size-3.5 text-[#415B2B]" />
@@ -801,7 +814,6 @@ export function PlantationManager() {
               })}
             </div>
           ) : (
-            /* Table Audit View */
             <div className="overflow-hidden rounded-[1.5rem] border border-[#E8E8DF] bg-white shadow-[0_2px_8px_rgba(26,28,24,0.05)]">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -841,6 +853,7 @@ export function PlantationManager() {
                               onClick={() => {
                                 setEditingPlantationId(plantation.plantationId);
                                 setFormState(toFormState(plantation));
+                                setIsFormOpen(true);
                                 setFeedback(null);
                                 setError(null);
                               }}

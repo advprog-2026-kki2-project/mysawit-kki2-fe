@@ -22,7 +22,7 @@ export function PlantationPage() {
                 Plantation Management.
               </h1>
               <p className="text-sm sm:text-base leading-relaxed text-ink-700 max-w-2xl">
-                Configure plantation, set plantation boundaries, and assign drivers and foremen to manage your plantations.
+                Configure and manage plantations, including setting boundaries and assigning personnel.
               </p>
             </div>
 
