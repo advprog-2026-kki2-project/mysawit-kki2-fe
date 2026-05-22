@@ -44,8 +44,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { ApiError } from "@/modules/auth/data/auth-api";
 import type { AuthResponse } from "@/modules/auth/data/types";
+import { getForemanHarvests } from "@/modules/harvest/data/harvest-api";
 import {
-  createDriver,
   getDrivers,
   getPlantations,
 } from "@/modules/plantation/data/plantation-api";
@@ -69,7 +69,6 @@ import {
   type Transport,
   type TransportStatus,
 } from "@/modules/transport/data/types";
-import { getUsers } from "@/modules/users/data/users-api";
 
 type TransportManagerProps = {
   session: AuthResponse;
@@ -134,6 +133,9 @@ function TransportStatusBadge({ status }: { status: TransportStatus }) {
 }
 
 export function TransportManager({ session }: TransportManagerProps) {
+  const isForeman = session.role === "FOREMAN";
+  const isDriver = session.role === "DRIVER";
+  const isAdmin = session.role === "ADMIN";
   const [transports, setTransports] = useState<Transport[]>([]);
   const [availablePickups, setAvailablePickups] = useState<ApprovedHarvestPickup[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -143,7 +145,6 @@ export function TransportManager({ session }: TransportManagerProps) {
   const [selectedHarvestIds, setSelectedHarvestIds] = useState<string[]>([]);
   const [pickupSearch, setPickupSearch] = useState("");
   const [driverSearch, setDriverSearch] = useState("");
-  const [driverLookup, setDriverLookup] = useState(session.username);
   const [historyDate, setHistoryDate] = useState("");
   const [adminForemanSearch, setAdminForemanSearch] = useState("");
   const [adminDate, setAdminDate] = useState("");
@@ -155,7 +156,11 @@ export function TransportManager({ session }: TransportManagerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [actionKey, setActionKey] = useState<string | null>(null);
 
-  const selectedPlantation = plantations.find(
+  const foremanPlantations = plantations.filter((plantation) =>
+    plantation.assignedForemanIds.includes(session.username),
+  );
+  const selectablePlantations = isForeman ? foremanPlantations : plantations;
+  const selectedPlantation = selectablePlantations.find(
     (plantation) => plantation.plantationId === selectedPlantationId,
   );
   const assignedDriverIds = selectedPlantation?.assignedDriverIds ?? [];
@@ -208,31 +213,49 @@ export function TransportManager({ session }: TransportManagerProps) {
     setError(null);
 
     try {
-      if (session.role === "FOREMAN") {
-        const [pickups, ongoing, plantationList, driverList, driverUsers] = await Promise.all([
+      if (isForeman) {
+        const [pickups, ongoing, plantationList, driverList, foremanHarvests] = await Promise.all([
           getAvailablePickups(),
           getOngoingDeliveries(),
           getPlantations(),
           getDrivers(),
-          getUsers({ role: "DRIVER" }),
+          getForemanHarvests({}),
         ]);
-        const driverIds = new Set(driverList.map((driver) => driver.driverId));
-        const missingDriverUsers = driverUsers.filter((user) => !driverIds.has(user.username));
-        const syncedDrivers = missingDriverUsers.length > 0
-          ? await syncDriverUsers(missingDriverUsers)
-          : [];
+        const scopedPlantations = plantationList.filter((plantation) =>
+          plantation.assignedForemanIds.includes(session.username),
+        );
+        const allowedHarvestIds = new Set(
+          foremanHarvests
+            .filter(
+              (harvest) =>
+                harvest.status === "APPROVED" &&
+                harvest.reviewedBy === session.username,
+            )
+            .map((harvest) => harvest.id),
+        );
 
-        setAvailablePickups(pickups);
-        setTransports(ongoing);
-        setPlantations(plantationList);
-        setDrivers([...driverList, ...syncedDrivers]);
-        setSelectedPlantationId((current) => current || plantationList[0]?.plantationId || "");
-      } else if (session.role === "ADMIN") {
+        setAvailablePickups(
+          pickups.filter((pickup) => allowedHarvestIds.has(pickup.harvestId)),
+        );
+        setTransports(
+          ongoing.filter((transport) => transport.foremanName === session.username),
+        );
+        setPlantations(scopedPlantations);
+        setDrivers(driverList);
+        setSelectedPlantationId((current) =>
+          scopedPlantations.some((plantation) => plantation.plantationId === current)
+            ? current
+            : scopedPlantations[0]?.plantationId || "",
+        );
+      } else if (isAdmin) {
         setTransports(await getForemanApprovedDeliveries());
-      } else if (session.role === "DRIVER") {
-        const lookup = options?.driverId ?? driverLookup;
+      } else if (isDriver) {
+        const lookup = options?.driverId ?? session.username;
         if (lookup.trim()) {
-          setTransports(await getDriverDeliveries(lookup.trim()));
+          const result = await getDriverDeliveries(session.username);
+          setTransports(
+            result.filter((transport) => transport.driverId === session.username),
+          );
         }
       }
     } catch (caughtError) {
@@ -244,20 +267,6 @@ export function TransportManager({ session }: TransportManagerProps) {
     } finally {
       setIsLoading(false);
     }
-  }
-
-  async function syncDriverUsers(driverUsers: Array<{ email: string; username: string }>) {
-    const results = await Promise.all(
-      driverUsers.map((user) =>
-        createDriver({
-          driverId: user.username,
-          driverName: user.username,
-          licenseNumber: user.email,
-        }).catch(() => null),
-      ),
-    );
-
-    return results.filter((driver): driver is Driver => driver !== null);
   }
 
   useEffect(() => {
@@ -313,7 +322,7 @@ export function TransportManager({ session }: TransportManagerProps) {
     try {
       await updateTransportStatus(transport.id, status);
       setFeedback(`Status pengiriman #${transport.id} diperbarui.`);
-      await loadData({ driverId: driverLookup });
+      await loadData({ driverId: session.username });
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Status gagal diperbarui.");
     } finally {
@@ -442,7 +451,7 @@ export function TransportManager({ session }: TransportManagerProps) {
                     <SelectValue placeholder="Semua kebun" />
                   </SelectTrigger>
                   <SelectContent>
-                    {plantations.map((plantation) => (
+                    {selectablePlantations.map((plantation) => (
                       <SelectItem key={plantation.plantationId} value={plantation.plantationId}>
                         {plantation.plantationName}
                       </SelectItem>
@@ -524,6 +533,11 @@ export function TransportManager({ session }: TransportManagerProps) {
               </h2>
             </div>
             <div className="space-y-5 p-4">
+              {selectablePlantations.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-[#c4c8ba] bg-[#f4f4ed] px-3 py-4 text-sm text-[#74796d]">
+                  Akun mandor ini belum ditempatkan pada kebun, sehingga belum dapat dispatch truk.
+                </p>
+              ) : null}
               <div className="rounded-lg bg-[#f4f4ed] p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="mono-label text-[#74796d]">Kapasitas Muatan</p>
@@ -601,7 +615,7 @@ export function TransportManager({ session }: TransportManagerProps) {
 
               <Button
                 type="submit"
-                disabled={!selectedDriverId || !loadIsValid || actionKey === "assign"}
+                disabled={selectablePlantations.length === 0 || !selectedDriverId || !loadIsValid || actionKey === "assign"}
                 className="w-full"
               >
                 <Truck className="size-4" />
@@ -700,20 +714,12 @@ export function TransportManager({ session }: TransportManagerProps) {
           className="grid gap-3 rounded-lg border border-[rgba(116,121,109,0.22)] bg-white p-4 sm:grid-cols-[minmax(0,1fr)_auto]"
           onSubmit={(event) => {
             event.preventDefault();
-            void loadData({ driverId: driverLookup });
+            void loadData({ driverId: session.username });
           }}
         >
-          <label className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#74796d]" />
-            <span className="sr-only">Cari pengiriman</span>
-            <Input
-              value={driverLookup}
-              onChange={(event) => setDriverLookup(event.target.value)}
-              placeholder="Masukkan Driver ID"
-              className="pl-11"
-              required
-            />
-          </label>
+          <div className="flex min-h-12 items-center rounded-lg border border-[#c4c8ba] bg-[#f4f4ed] px-4 text-sm font-semibold text-[#44483e]">
+            Tugas untuk supir {session.username}
+          </div>
           <Button type="submit" disabled={isLoading}>
             <RefreshCcw className="size-4" />
             Muat Tugas

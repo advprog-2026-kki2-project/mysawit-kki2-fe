@@ -118,29 +118,29 @@ async function loadDashboardOverview(
 
   const results = await Promise.all(requests);
 
-  return results.reduce<DashboardOverview>((overview, result) => {
+  const overview = results.reduce<DashboardOverview>((currentOverview, result) => {
     if (result.error) {
-      overview.errors.push(result.error);
-      return overview;
+      currentOverview.errors.push(result.error);
+      return currentOverview;
     }
 
     if (result.label === "Harvest") {
-      overview.harvests = result.value as HarvestRecord[];
+      currentOverview.harvests = result.value as HarvestRecord[];
     }
     if (result.label === "Payroll") {
-      overview.payrolls = result.value as Payroll[];
+      currentOverview.payrolls = result.value as Payroll[];
     }
     if (result.label === "Plantations") {
-      overview.plantations = result.value as Plantation[];
+      currentOverview.plantations = result.value as Plantation[];
     }
     if (result.label === "Transport") {
-      overview.transports = result.value as Transport[];
+      currentOverview.transports = result.value as Transport[];
     }
     if (result.label === "Users") {
-      overview.users = result.value as User[];
+      currentOverview.users = result.value as User[];
     }
 
-    return overview;
+    return currentOverview;
   }, {
     harvests: [...emptyOverview.harvests],
     payrolls: [...emptyOverview.payrolls],
@@ -149,4 +149,40 @@ async function loadDashboardOverview(
     users: [...emptyOverview.users],
     errors: [...emptyOverview.errors],
   });
+
+  if (session.role === "FOREMAN") {
+    overview.transports = overview.transports.filter(
+      (transport) => transport.foremanName === session.username,
+    );
+    overview.payrolls = overview.payrolls.filter(
+      (payroll) => payroll.beneficiaryReference === session.username,
+    );
+    overview.users = [];
+    overview.plantations = [];
+  }
+
+  if (session.role === "DRIVER") {
+    overview.transports = overview.transports.filter(
+      (transport) => transport.driverId === session.username,
+    );
+    overview.payrolls = overview.payrolls.filter(
+      (payroll) => payroll.beneficiaryReference === session.username,
+    );
+    overview.users = [];
+    overview.plantations = [];
+  }
+
+  if (session.role === "LABORER") {
+    overview.harvests = overview.harvests.filter(
+      (harvest) => harvest.laborerName === session.username,
+    );
+    overview.payrolls = overview.payrolls.filter(
+      (payroll) => payroll.beneficiaryReference === session.username,
+    );
+    overview.transports = [];
+    overview.users = [];
+    overview.plantations = [];
+  }
+
+  return overview;
 }

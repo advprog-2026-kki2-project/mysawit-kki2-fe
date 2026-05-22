@@ -247,21 +247,16 @@ function TeamSnapshot({
   session: AuthResponse;
 }) {
   const canManageUsers = session.role === "ADMIN";
+  if (!canManageUsers) {
+    return null;
+  }
+
   const rows = data.users.slice(0, 5).map((user) => ({
     email: user.email,
     name: user.username,
     role: roleLabels[user.role],
     status: user.role === "ADMIN" ? "Admin" : "Aktif",
   }));
-
-  if (!canManageUsers && rows.length === 0) {
-    rows.push({
-      email: "Sesi aktif",
-      name: session.username,
-      role: roleLabels[session.role],
-      status: "Aktif",
-    });
-  }
 
   return (
     <section className="overflow-hidden rounded-lg border border-[#c4c8ba]/70 bg-white shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
@@ -363,6 +358,10 @@ function GardenManagement({
   const canOpenPlantations = getNavigationForRole(session.role).some(
     (item) => item.href === "/plantations",
   );
+  if (!canOpenPlantations) {
+    return null;
+  }
+
   const blocks = data.plantations.slice(0, 4);
 
   return (

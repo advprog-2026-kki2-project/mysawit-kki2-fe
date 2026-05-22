@@ -59,6 +59,14 @@ function formatPayrollPeriod(payroll: Payroll) {
   }).format(new Date(payroll.createdAt));
 }
 
+function localTodayIso() {
+  const today = new Date();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
 function LaborerHarvestWorkspace({ session }: { session: AuthResponse }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [records, setRecords] = useState<HarvestRecord[]>([]);
@@ -68,7 +76,7 @@ function LaborerHarvestWorkspace({ session }: { session: AuthResponse }) {
 
   const pendingReportCount = records.filter((record) => record.status === "PENDING").length;
   const todayRecord = records.find(
-    (record) => record.harvestDate === new Date().toISOString().slice(0, 10),
+    (record) => record.harvestDate === localTodayIso(),
   );
   const totalHarvestKg = records.reduce((total, record) => total + record.weightKg, 0);
   const acceptedPayrollAmount = payrolls

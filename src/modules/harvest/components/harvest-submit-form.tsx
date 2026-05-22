@@ -19,7 +19,23 @@ type HarvestSubmitFormProps = {
 };
 
 function todayIsoDate() {
-  return new Date().toISOString().slice(0, 10);
+  const today = new Date();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+function uploadTextForState(isSubmitting: boolean, isTodaySubmitted: boolean) {
+  if (isSubmitting) {
+    return "Mengunggah foto bukti panen";
+  }
+
+  if (isTodaySubmitted) {
+    return "Laporan hari ini sudah ada";
+  }
+
+  return "Upload foto bukti panen";
 }
 
 export function HarvestSubmitForm({
@@ -155,8 +171,9 @@ export function HarvestSubmitForm({
             }}
             multiple
             maxFiles={6}
-            isUploading={isSubmitting || isTodaySubmitted}
-            uploadText="Upload foto bukti panen"
+            disabled={isTodaySubmitted}
+            isUploading={isSubmitting}
+            uploadText={uploadTextForState(isSubmitting, isTodaySubmitted)}
             helperText="Pilih minimal 1 foto, maksimal 6 foto, masing-masing 30MB"
             required
           />
