@@ -373,7 +373,6 @@ export function PlantationManager() {
               size="sm"
               onClick={() => {
                 setFilterName("");
-                setFilterCode("");
                 setFilterForemanId("");
               }}
               className="text-[#BA1A1A] hover:bg-[#FFDAD6] h-8 text-xs font-semibold"
@@ -390,16 +389,6 @@ export function PlantationManager() {
               placeholder="Search plantation name..."
               value={filterName}
               onChange={(e) => setFilterName(e.target.value)}
-              className="h-10 text-xs rounded-lg border-[#DADAD3]"
-            />
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="filter-code" className="text-[10px] font-bold text-[#5F6358] uppercase tracking-wider">Plantation Code</label>
-            <Input
-              id="filter-code"
-              placeholder="Search plantation code..."
-              value={filterCode}
-              onChange={(e) => setFilterCode(e.target.value)}
               className="h-10 text-xs rounded-lg border-[#DADAD3]"
             />
           </div>

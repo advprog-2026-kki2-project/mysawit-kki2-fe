@@ -16,13 +16,13 @@ export function getPlantations(filters?: { name?: string; code?: string; foreman
 }
 
 export function getForemen() {
-  return requestJson<Foreman[]>("/api/plantations/foremen", {
+  return requestJson<Foreman[]>("/api/foremen", {
     method: "GET",
   });
 }
 
 export function getDrivers() {
-  return requestJson<Driver[]>("/api/plantations/drivers", {
+  return requestJson<Driver[]>("/api/drivers", {
     method: "GET",
   });
 }

@@ -38,14 +38,20 @@ export function CoordinateVisualizer({
   // Parse current input corners
   const parsedCurrentCorners = useMemo(() => {
     return currentCorners
+      .filter(c => {
+        if (c.x === undefined || c.y === undefined || c.x === null || c.y === null) return false;
+        const xStr = String(c.x).trim();
+        const yStr = String(c.y).trim();
+        return xStr !== "" && yStr !== "";
+      })
       .map(c => ({ x: Number(c.x), y: Number(c.y) }))
       .filter(c => !isNaN(c.x) && !isNaN(c.y));
   }, [currentCorners]);
 
   // Check overlap against other active plantations
   const overlappingPlantations = useMemo(() => {
-    if (parsedCurrentCorners.length < 3) return [];
-    
+    if (parsedCurrentCorners.length < 4) return [];
+
     return plantations.filter(p => {
       if (p.plantationId === editingId) return false;
       return isBoundingBoxOverlap(parsedCurrentCorners, p.corners);
@@ -71,11 +77,11 @@ export function CoordinateVisualizer({
   // Compute bounding box of all coordinates to scale the SVG viewbox dynamically
   const bounds = useMemo(() => {
     const points: { x: number; y: number }[] = [];
-    
+
     plantations.forEach(p => {
       points.push(...p.corners);
     });
-    
+
     if (parsedCurrentCorners.length > 0) {
       points.push(...parsedCurrentCorners);
     }
@@ -155,7 +161,7 @@ export function CoordinateVisualizer({
           {plantations.map(p => {
             if (p.plantationId === editingId) return null;
             const pointsStr = p.corners.map(c => `${toSvgX(c.x)},${toSvgY(c.y)}`).join(" ");
-            
+
             return (
               <g key={p.plantationId} className="group">
                 <polygon
@@ -200,7 +206,7 @@ export function CoordinateVisualizer({
                 strokeWidth="2.5"
                 className="transition-all duration-200"
               />
-              
+
               {/* Corner handles & text labels */}
               {parsedCurrentCorners.map((corner, i) => {
                 const cx = toSvgX(corner.x);
@@ -215,7 +221,7 @@ export function CoordinateVisualizer({
                       className="animate-pulse shadow-md"
                     />
                     <circle cx={cx} cy={cy} r="2" fill="white" />
-                    
+
                     {/* Mono Coordinate Text label */}
                     <text
                       x={cx}
