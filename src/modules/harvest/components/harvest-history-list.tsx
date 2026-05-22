@@ -5,15 +5,15 @@ import { Syne, Plus_Jakarta_Sans } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
-import { getLaborerHistory } from "@/modules/harvest/data/harvest-api";
-import type { DailyHarvest } from "@/modules/harvest/data/types";
+import { getLaborerHarvestHistory } from "@/modules/harvest/data/harvest-api";
+import type { HarvestRecord } from "@/modules/harvest/data/types";
 
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export function HarvestHistoryList() {
   const { session, isLoading: isAuthLoading } = useAuthSession();
-  const [history, setHistory] = useState<DailyHarvest[]>([]);
+  const [history, setHistory] = useState<HarvestRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState("");
@@ -24,7 +24,7 @@ export function HarvestHistoryList() {
     if (!session) return;
     setIsLoading(true); setError(null);
     try {
-      const data = await getLaborerHistory(status === "ALL" ? "" : status, startDate, endDate);
+      const data = await getLaborerHarvestHistory({ status: status === "ALL" ? undefined : status, startDate, endDate });
       setHistory(data);
     } catch (err) {
       setError("Failed to fetch harvest history. Please try again later.");

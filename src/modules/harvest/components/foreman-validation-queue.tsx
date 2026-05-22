@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
-import { getForemanQueue, approveHarvest, rejectHarvest } from "@/modules/harvest/data/harvest-api";
-import type { DailyHarvest } from "@/modules/harvest/data/types";
+import { getForemanHarvests, approveHarvest, rejectHarvest } from "@/modules/harvest/data/harvest-api";
+import type { HarvestRecord } from "@/modules/harvest/data/types";
 
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -20,8 +20,8 @@ const LeafIcon = () => (
 
 export function ForemanValidationQueue() {
   const { session, isLoading: isAuthLoading } = useAuthSession();
-  const [queue, setQueue] = useState<DailyHarvest[]>([]);
-  const [selectedRecord, setSelectedRecord] = useState<DailyHarvest | null>(null);
+  const [queue, setQueue] = useState<HarvestRecord[]>([]);
+  const [selectedRecord, setSelectedRecord] = useState<HarvestRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +34,7 @@ export function ForemanValidationQueue() {
     if (!session) return;
     setIsLoading(true); setError(null);
     try {
-      const data = await getForemanQueue(filterName, filterDate);
+      const data = await getForemanHarvests({ laborerName: filterName, harvestDate: filterDate });
       setQueue(data);
       setSelectedRecord((prev) => prev ? (data.find((r) => r.id === prev.id) || null) : null);
     } catch (err) { setError("Failed to fetch validation queue."); } finally { setIsLoading(false); }
@@ -57,7 +57,7 @@ export function ForemanValidationQueue() {
     if (!selectedRecord || !session || !rejectReason.trim()) return;
     setIsProcessing(true); setError(null);
     try {
-      await rejectHarvest(selectedRecord.id, { reason: rejectReason });
+      await rejectHarvest(selectedRecord.id, rejectReason);
       setIsRejectModalOpen(false); setRejectReason(""); await fetchQueue();
     } catch (err) { setError(err instanceof Error ? err.message : "Failed to reject harvest."); } finally { setIsProcessing(false); }
   };
