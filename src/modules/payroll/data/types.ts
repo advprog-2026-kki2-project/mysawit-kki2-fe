@@ -70,6 +70,8 @@ export type XenditWalletTopUp = {
   creditedAt: string | null;
   paymentMethod: string | null;
   paymentChannel: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type WageConfiguration = {

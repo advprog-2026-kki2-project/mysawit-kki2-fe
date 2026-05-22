@@ -73,6 +73,12 @@ export function createXenditTopUp(amount: number) {
   });
 }
 
+export function getXenditTopUps() {
+  return requestJson<XenditWalletTopUp[]>("/api/payment/wallet/top-up/xendit", {
+    method: "GET",
+  });
+}
+
 export function getXenditTopUp(paymentId: string) {
   return requestJson<XenditWalletTopUp>(`/api/payment/wallet/top-up/xendit/${paymentId}`, {
     method: "GET",
