@@ -1,23 +1,31 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
-
+import { Syne, Plus_Jakarta_Sans } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/modules/auth/data/auth-api";
-import { roleLabels } from "@/modules/auth/data/types";
 import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
 import { submitHarvest } from "@/modules/harvest/data/harvest-api";
 import type { HarvestSubmissionResult } from "@/modules/harvest/data/types";
 
+const syne = Syne({ subsets: ["latin"], weight: ["700"] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+
+const LeafIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#80B048] mb-4 opacity-80">
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+  </svg>
+);
+
 export function HarvestSubmitForm() {
-  const { session, isLoading } = useAuthSession();
+  const { isLoading } = useAuthSession();
   const [harvestDate, setHarvestDate] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [notes, setNotes] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [photoInputKey, setPhotoInputKey] = useState(0);
   const [result, setResult] = useState<HarvestSubmissionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +33,9 @@ export function HarvestSubmitForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!photo) {
-      setError("Foto bukti wajib diunggah.");
+
+    if (photos.length === 0) {
+      setError("At least one photo evidence is required.");
       return;
     }
 
@@ -39,20 +48,21 @@ export function HarvestSubmitForm() {
         harvestDate,
         weightKg,
         notes,
-        photo,
+        photos,
       });
+
       setResult(submissionResult);
       setHarvestDate("");
       setWeightKg("");
       setNotes("");
-      setPhoto(null);
+      setPhotos([]);
       setPhotoInputKey((current) => current + 1);
     } catch (caughtError) {
-      if (caughtError instanceof ApiError || caughtError instanceof Error) {
-        setError(caughtError.message);
-      } else {
-        setError("Panen gagal dikirim.");
-      }
+      setError(
+        caughtError instanceof ApiError || caughtError instanceof Error
+          ? caughtError.message
+          : "Failed to submit harvest record."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -60,169 +70,214 @@ export function HarvestSubmitForm() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="h-12 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-        <div className="h-72 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Login diperlukan.
-        </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Masuk sebagai pekerja untuk mengirim data panen.
-        </p>
-        <Button asChild className="mt-6">
-          <Link href="/login">Masuk</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  if (session.role !== "LABORER") {
-    return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Akses dibatasi.
-        </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Form panen hanya tersedia untuk pekerja. Sesi aktif Anda menggunakan
-          role {roleLabels[session.role].toLowerCase()}.
-        </p>
+      <div className="space-y-[16px]">
+        <div className="h-[48px] animate-pulse rounded-[12px] bg-[#F0F0E8]" />
+        <div className="h-[280px] animate-pulse rounded-[16px] bg-[#F0F0E8]" />
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Harvest Form</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Catat panen hari ini.
+    <div className={`grid gap-[24px] lg:grid-cols-[0.9fr_1.1fr] ${jakarta.className}`}>
+      <section className="bg-[#FFFFFF] border border-[#E8E8DF] rounded-[16px] p-[24px] shadow-[0_2px_8px_rgba(26,28,24,0.05)] hover:shadow-[0_8px_24px_rgba(26,28,24,0.08)] transition-shadow duration-160">
+        <p className="text-[12px] font-mono font-bold tracking-[0.08em] text-[#5F6358] uppercase">Harvest Form</p>
+
+        <h2 className={`mt-[12px] text-[22px] font-bold leading-[1.2] tracking-[-0.4px] text-[#1A1C18] ${syne.className}`}>
+          Record Today's Harvest
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Nama pekerja akan diambil dari sesi backend yang aktif.
+
+        <p className="mt-[8px] text-[16px] leading-[1.6] text-[#3D4038]">
+          The laborer name will be automatically bound to your active session identity.
         </p>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-date">
-              Tanggal panen
-            </label>
+        <form className="mt-[32px] space-y-[16px]" onSubmit={handleSubmit}>
+          <div className="space-y-[8px]">
+            <label className="text-[14px] font-semibold text-[#3D4038]">Harvest Date</label>
             <Input
-              id="harvest-date"
               type="date"
               value={harvestDate}
-              onChange={(event) => setHarvestDate(event.target.value)}
+              onChange={(e) => setHarvestDate(e.target.value)}
+              className={`h-[44px] px-[14px] bg-[#FFFFF1] border-[#DADAD3] rounded-[8px] text-[16px] text-[#1A1C18] focus-visible:border-[#2F7D4C] focus-visible:ring-[3px] focus-visible:ring-[#80B048]/28 ${jakarta.className}`}
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="weight-kg">
-              Berat panen (kg)
-            </label>
+          <div className="space-y-[8px]">
+            <label className="text-[14px] font-semibold text-[#3D4038]">Harvest Weight (kg)</label>
             <Input
-              id="weight-kg"
               type="number"
               min="0"
               step="0.01"
               value={weightKg}
-              onChange={(event) => setWeightKg(event.target.value)}
+              onChange={(e) => setWeightKg(e.target.value)}
               placeholder="120.5"
+              className={`h-[44px] px-[14px] bg-[#FFFFF1] border-[#DADAD3] rounded-[8px] text-[16px] text-[#1A1C18] focus-visible:border-[#2F7D4C] focus-visible:ring-[3px] focus-visible:ring-[#80B048]/28 ${jakarta.className}`}
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-notes">
-              Catatan
-            </label>
+          <div className="space-y-[8px]">
+            <label className="text-[14px] font-semibold text-[#3D4038]">Notes</label>
             <Textarea
-              id="harvest-notes"
               value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              placeholder="Tuliskan kondisi panen hari ini."
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Enter harvest conditions or specific block notes."
+              className={`p-[14px] bg-[#FFFFF1] border-[#DADAD3] rounded-[8px] text-[16px] text-[#1A1C18] focus-visible:border-[#2F7D4C] focus-visible:ring-[3px] focus-visible:ring-[#80B048]/28 min-h-[96px] resize-none ${jakarta.className}`}
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-photo">
-              Foto bukti
-            </label>
-            <Input
-              key={photoInputKey}
-              id="harvest-photo"
-              type="file"
-              accept="image/*"
-              onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
-              required
-            />
-          </div>
+          <div className="space-y-[8px]">
+  <label className="text-[14px] font-semibold text-[#3D4038]">Photo Evidence</label>
 
-          <Button className="w-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Mengirim..." : "Kirim panen"}
-          </Button>
+  <div className="relative border-[1.5px] border-dashed border-[#DADAD3] rounded-[8px] p-[16px] bg-[#FFFFF1] text-center hover:bg-[#F6FBEF] transition-colors cursor-pointer min-h-[72px] flex items-center justify-center">
+    <Input
+      key={photoInputKey}
+      type="file"
+      accept="image/*"
+      multiple
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      onChange={(e) => {
+        const selectedFiles = Array.from(e.target.files ?? []);
+
+        setPhotos((currentPhotos) => {
+          const existingKeys = new Set(
+            currentPhotos.map((file) => `${file.name}-${file.size}-${file.lastModified}`)
+          );
+
+          const newFiles = selectedFiles.filter(
+            (file) => !existingKeys.has(`${file.name}-${file.size}-${file.lastModified}`)
+          );
+
+          return [...currentPhotos, ...newFiles];
+        });
+
+        e.target.value = "";
+      }}
+      required={photos.length === 0}
+    />
+
+    <p className="text-[13px] font-medium text-[#3D4038]">
+      {photos.length > 0 ? `${photos.length} photo(s) selected` : "+ Add photo evidence"}
+    </p>
+  </div>
+
+  {photos.length > 0 && (
+    <div className="grid grid-cols-2 gap-2">
+      {photos.map((photo, index) => (
+        <div
+          key={`${photo.name}-${photo.size}-${photo.lastModified}`}
+          className="rounded-[8px] border border-[#E8E8DF] bg-white p-2"
+        >
+          <p className="truncate text-[12px] font-medium text-[#3D4038]">
+            {index + 1}. {photo.name}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setPhotos((currentPhotos) => currentPhotos.filter((_, photoIndex) => photoIndex !== index));
+            }}
+            className="mt-1 text-[12px] font-semibold text-[#BA1A1A]"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+          <div className="pt-[12px]">
+            <Button
+              className={`w-full bg-[#415B2B] text-[#FFFFF1] hover:bg-[#314A21] rounded-[8px] font-bold text-[14px] min-h-[44px] shadow-[0_1px_2px_rgba(26,28,24,0.08)] disabled:bg-[#F0F0E8] disabled:text-[#8A8D83] ${jakarta.className}`}
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Harvest"}
+            </Button>
+          </div>
         </form>
 
-        {error ? (
-          <p className="mt-4 rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+        {error && (
+          <p className="mt-[16px] rounded-[8px] border border-[#BA1A1A]/20 bg-[#FFDAD6] px-[16px] py-[12px] text-[14px] font-medium text-[#BA1A1A]">
             {error}
           </p>
-        ) : null}
+        )}
       </section>
 
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Submission Status</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Ringkasan pengiriman panen.
+      <section className="bg-[#FFFFFF] border border-[#E8E8DF] rounded-[16px] p-[24px] shadow-[0_2px_8px_rgba(26,28,24,0.05)] hover:shadow-[0_8px_24px_rgba(26,28,24,0.08)] transition-shadow duration-160 flex flex-col">
+        <p className="text-[12px] font-mono font-bold tracking-[0.08em] text-[#5F6358] uppercase">Submission Status</p>
+
+        <h2 className={`mt-[12px] text-[22px] font-bold leading-[1.2] tracking-[-0.4px] text-[#1A1C18] ${syne.className}`}>
+          Submission Summary
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Backend saat ini sudah mendukung submit panen beserta upload foto.
+
+        <p className="mt-[8px] text-[16px] leading-[1.6] text-[#3D4038]">
+          Review details of your harvest record after submission.
         </p>
 
         {result ? (
-          <div className="mt-8 rounded-[1.6rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] p-5">
-            <p className="text-sm font-medium text-[#0d0d0d]">{result.message}</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Pekerja</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.laborerName}
-                </p>
+          <div className="mt-[32px] rounded-[12px] border border-[#2F7D4C]/20 bg-[#DAF1E3] p-[20px]">
+            <p className="text-[14px] font-semibold text-[#2F7D4C]">{result.message}</p>
+
+            <div className="mt-[20px] grid gap-[12px] sm:grid-cols-2">
+              <div className="rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] px-[16px] py-[12px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+                <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase">Laborer</p>
+                <p className="mt-[4px] text-[14px] font-bold text-[#1A1C18]">{result.laborerName}</p>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Status</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
+
+              <div className="rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] px-[16px] py-[12px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+                <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase">Status</p>
+                <span className={`inline-flex items-center justify-center min-h-[24px] mt-[4px] px-[10px] py-[2px] rounded-[9999px] text-[11px] font-mono font-bold tracking-[0.06em] uppercase ${
+                  result.status === "APPROVED" ? "bg-[#DAF1E3] text-[#2F7D4C]" :
+                  result.status === "REJECTED" ? "bg-[#FFDAD6] text-[#BA1A1A]" :
+                  "bg-[#F3E7D2] text-[#774E15]"
+                }`}>
                   {result.status}
-                </p>
+                </span>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Tanggal</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.harvestDate}
-                </p>
+
+              <div className="rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] px-[16px] py-[12px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+                <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase">Date</p>
+                <p className="mt-[4px] text-[14px] font-bold text-[#1A1C18]">{result.harvestDate}</p>
               </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Berat</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.weightKg} kg
-                </p>
+
+              <div className="rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] px-[16px] py-[12px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+                <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase">Weight</p>
+                <p className="mt-[4px] text-[14px] font-bold text-[#415B2B]">{result.weightKg} kg</p>
               </div>
             </div>
-            <div className="mt-3 rounded-[1.25rem] bg-white px-4 py-3">
-              <p className="mono-label text-[#888888]">Catatan</p>
-              <p className="mt-2 text-sm leading-7 text-[#333333]">{result.notes}</p>
+
+            {result.photoUrls && result.photoUrls.length > 0 && (
+              <div className="mt-[12px] rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] p-[8px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+                <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase px-[8px] pb-[8px]">
+                  Photo Evidence
+                </p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {result.photoUrls.map((url, index) => (
+                    <div key={index} className="w-full h-[140px] bg-[#F0F0E8] rounded-[6px] overflow-hidden border border-[#E8E8DF]">
+                      <img
+                        src={`${(process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "")}${url}`}
+                        alt={`Harvest Evidence ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-[12px] rounded-[8px] bg-[#FFFFFF] border border-[#E8E8DF] px-[16px] py-[12px] shadow-[0_1px_2px_rgba(26,28,24,0.08)]">
+              <p className="text-[11px] font-mono font-bold tracking-[0.06em] text-[#5F6358] uppercase">Notes</p>
+              <p className="mt-[4px] text-[14px] leading-[1.6] text-[#3D4038]">{result.notes}</p>
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-[1.5rem] border border-dashed border-[rgba(13,13,13,0.1)] px-5 py-8 text-sm text-[#666666]">
-            Belum ada pengiriman panen di sesi ini.
+          <div className="mt-auto pt-[32px] flex-1 flex flex-col items-center justify-center rounded-[12px] border border-dashed border-[#DADAD3] p-[24px] text-center bg-[#FFFFF1]/40">
+            <LeafIcon />
+            <p className="text-[16px] font-medium text-[#5F6358]">No harvest submitted today.</p>
           </div>
         )}
       </section>
