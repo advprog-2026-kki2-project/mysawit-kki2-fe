@@ -1,32 +1,70 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/modules/auth/data/auth-api";
-import { roleLabels } from "@/modules/auth/data/types";
-import { useAuthSession } from "@/modules/auth/hooks/use-auth-session";
 import { submitHarvest } from "@/modules/harvest/data/harvest-api";
 import type { HarvestSubmissionResult } from "@/modules/harvest/data/types";
 
-export function HarvestSubmitForm() {
-  const { session, isLoading } = useAuthSession();
-  const [harvestDate, setHarvestDate] = useState("");
+type HarvestSubmitFormProps = {
+  onSubmitted?: (result: HarvestSubmissionResult) => void;
+  isTodaySubmitted?: boolean;
+  todaySubmittedStatus?: string | null;
+};
+
+function todayIsoDate() {
+  const today = new Date();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+function uploadTextForState(isSubmitting: boolean, isTodaySubmitted: boolean) {
+  if (isSubmitting) {
+    return "Mengunggah foto bukti panen";
+  }
+
+  if (isTodaySubmitted) {
+    return "Laporan hari ini sudah ada";
+  }
+
+  return "Upload foto bukti panen";
+}
+
+export function HarvestSubmitForm({
+  isTodaySubmitted = false,
+  onSubmitted,
+  todaySubmittedStatus,
+}: HarvestSubmitFormProps) {
+  const [harvestDate, setHarvestDate] = useState(todayIsoDate());
   const [weightKg, setWeightKg] = useState("");
   const [notes, setNotes] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [photoInputKey, setPhotoInputKey] = useState(0);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [result, setResult] = useState<HarvestSubmissionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!photo) {
-      setError("Foto bukti wajib diunggah.");
+    if (!harvestDate) {
+      setError("Tanggal panen wajib dipilih.");
+      return;
+    }
+
+    if (isTodaySubmitted) {
+      setError("Laporan panen hari ini sudah tersimpan. Silakan menunggu besok.");
+      return;
+    }
+
+    if (photos.length < 1) {
+      setError("Unggah minimal 1 foto bukti panen.");
       return;
     }
 
@@ -39,93 +77,44 @@ export function HarvestSubmitForm() {
         harvestDate,
         weightKg,
         notes,
-        photo,
+        photos,
       });
       setResult(submissionResult);
-      setHarvestDate("");
+      setHarvestDate(todayIsoDate());
       setWeightKg("");
       setNotes("");
-      setPhoto(null);
-      setPhotoInputKey((current) => current + 1);
+      setPhotos([]);
+      onSubmitted?.(submissionResult);
     } catch (caughtError) {
-      if (caughtError instanceof ApiError || caughtError instanceof Error) {
-        setError(caughtError.message);
-      } else {
-        setError("Panen gagal dikirim.");
-      }
+      setError(
+        caughtError instanceof ApiError || caughtError instanceof Error
+          ? caughtError.message
+          : "Panen gagal dikirim.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-12 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-        <div className="h-72 animate-pulse rounded-[1.5rem] bg-[#f5f5f5]" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Login diperlukan.
-        </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Masuk sebagai pekerja untuk mengirim data panen.
-        </p>
-        <Button asChild className="mt-6">
-          <Link href="/login">Masuk</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  if (session.role !== "LABORER") {
-    return (
-      <div className="surface-panel rounded-[2rem] p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Akses dibatasi.
-        </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Form panen hanya tersedia untuk pekerja. Sesi aktif Anda menggunakan
-          role {roleLabels[session.role].toLowerCase()}.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Harvest Form</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Catat panen hari ini.
+    <section className="overflow-hidden rounded-lg border border-[#c4c8ba]/70 bg-white shadow-[0_18px_44px_rgba(119,78,21,0.08)]">
+      <div className="border-b border-[#c4c8ba]/70 bg-[#203b28] px-5 py-4 text-white">
+        <h2 className="font-[var(--font-syne)] text-lg font-bold">
+          Catat Panen Hari Ini
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Nama pekerja akan diambil dari sesi backend yang aktif.
-        </p>
+        {isTodaySubmitted ? (
+          <p className="mt-1 text-sm text-white/75">
+            Laporan hari ini sudah tersimpan dengan status {todaySubmittedStatus ?? "PENDING"}.
+          </p>
+        ) : null}
+      </div>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-date">
-              Tanggal panen
-            </label>
-            <Input
-              id="harvest-date"
-              type="date"
-              value={harvestDate}
-              onChange={(event) => setHarvestDate(event.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="weight-kg">
-              Berat panen (kg)
-            </label>
+      <form className="space-y-5 p-5" onSubmit={handleSubmit}>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+              Kilogram sawit dipanen
+            </span>
             <Input
               id="weight-kg"
               type="number"
@@ -133,99 +122,88 @@ export function HarvestSubmitForm() {
               step="0.01"
               value={weightKg}
               onChange={(event) => setWeightKg(event.target.value)}
-              placeholder="120.5"
+              placeholder="0.00"
+              disabled={isSubmitting || isTodaySubmitted}
               required
             />
-          </div>
+          </label>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-notes">
-              Catatan
-            </label>
-            <Textarea
-              id="harvest-notes"
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              placeholder="Tuliskan kondisi panen hari ini."
-              required
+          <label className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+              Tanggal panen
+            </span>
+            <DatePicker
+              id="harvest-date"
+              value={harvestDate}
+              onChange={setHarvestDate}
+              placeholder="Pilih tanggal panen"
+              disabled={isSubmitting || isTodaySubmitted}
             />
-          </div>
+          </label>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#333333]" htmlFor="harvest-photo">
-              Foto bukti
-            </label>
-            <Input
-              key={photoInputKey}
-              id="harvest-photo"
-              type="file"
-              accept="image/*"
-              onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
-              required
-            />
-          </div>
+        <label className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+            Berita hasil panen
+          </span>
+          <Textarea
+            id="harvest-notes"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder="Catat kondisi lapangan, kendala akses, atau kualitas panen."
+            className="min-h-28"
+            disabled={isSubmitting || isTodaySubmitted}
+            required
+          />
+        </label>
 
-          <Button className="w-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Mengirim..." : "Kirim panen"}
-          </Button>
-        </form>
-
-        {error ? (
-          <p className="mt-4 rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
-            {error}
+        <div className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.01em] text-[#74796d]">
+            Bukti foto
           </p>
-        ) : null}
-      </section>
+          <FileUpload
+            id="harvest-photos"
+            accept="image/*"
+            value={photos}
+            onChange={(files) => {
+              setPhotos(Array.isArray(files) ? files : files ? [files] : []);
+              setError(null);
+            }}
+            multiple
+            maxFiles={6}
+            disabled={isTodaySubmitted}
+            isUploading={isSubmitting}
+            uploadText={uploadTextForState(isSubmitting, isTodaySubmitted)}
+            helperText="Pilih minimal 1 foto, maksimal 6 foto, masing-masing 30MB"
+            required
+          />
+          <p className="text-sm text-[#74796d]">
+            Foto bukti diperlukan untuk setiap laporan panen.
+          </p>
+        </div>
 
-      <section className="surface-panel rounded-[2rem] p-6 sm:p-7">
-        <p className="mono-label text-[#888888]">Submission Status</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-          Ringkasan pengiriman panen.
-        </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
-          Backend saat ini sudah mendukung submit panen beserta upload foto.
+        <Button className="w-full" type="submit" disabled={isSubmitting || isTodaySubmitted}>
+          <Send className="size-4" />
+          {isTodaySubmitted
+            ? "Laporan hari ini sudah ada"
+            : isSubmitting
+              ? "Mengirim laporan..."
+              : "Kirim laporan panen"}
+        </Button>
+      </form>
+
+      {error ? (
+        <p className="mx-5 mb-5 rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
+          {error}
         </p>
+      ) : null}
 
-        {result ? (
-          <div className="mt-8 rounded-[1.6rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] p-5">
-            <p className="text-sm font-medium text-[#0d0d0d]">{result.message}</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Pekerja</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.laborerName}
-                </p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Status</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.status}
-                </p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Tanggal</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.harvestDate}
-                </p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white px-4 py-3">
-                <p className="mono-label text-[#888888]">Berat</p>
-                <p className="mt-2 text-sm font-medium text-[#0d0d0d]">
-                  {result.weightKg} kg
-                </p>
-              </div>
-            </div>
-            <div className="mt-3 rounded-[1.25rem] bg-white px-4 py-3">
-              <p className="mono-label text-[#888888]">Catatan</p>
-              <p className="mt-2 text-sm leading-7 text-[#333333]">{result.notes}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-8 rounded-[1.5rem] border border-dashed border-[rgba(13,13,13,0.1)] px-5 py-8 text-sm text-[#666666]">
-            Belum ada pengiriman panen di sesi ini.
-          </div>
-        )}
-      </section>
-    </div>
+      {result ? (
+        <p className="mx-5 mb-5 rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] px-4 py-3 text-sm text-[#1a1c18]">
+          Laporan {result.weightKg} kg untuk {result.harvestDate} berhasil dikirim
+          dan menunggu review mandor.
+        </p>
+      ) : null}
+    </section>
   );
 }

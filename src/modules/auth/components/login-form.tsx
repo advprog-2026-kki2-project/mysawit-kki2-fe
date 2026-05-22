@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { startTransition, useState, type FormEvent } from "react";
+import { startTransition, useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, LogOut, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,7 @@ export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [safeNextPath, setSafeNextPath] = useState("/dashboard");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +26,14 @@ export function LoginForm() {
     error: sessionError,
     refreshSession,
   } = useAuthSession();
+
+  useEffect(() => {
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+
+    if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")) {
+      setSafeNextPath(nextPath);
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,7 +46,7 @@ export function LoginForm() {
       setFeedback(result.message);
       await refreshSession();
       startTransition(() => {
-        router.push("/");
+        router.push(safeNextPath);
         router.refresh();
       });
     } catch (caughtError) {
@@ -75,10 +84,10 @@ export function LoginForm() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-6 w-32 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
-        <div className="h-12 animate-pulse rounded-full bg-[#f5f5f5]" />
+        <div className="h-6 w-32 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
+        <div className="h-12 animate-pulse rounded-full bg-[#e3e3dc]" />
       </div>
     );
   }
@@ -86,32 +95,32 @@ export function LoginForm() {
   if (session) {
     return (
       <div className="space-y-6">
-        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#d4fae8] text-[#0fa76e]">
+        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#cdedae] text-[#3f6901]">
           <ShieldCheck className="size-5" />
         </div>
         <div>
-          <p className="mono-label text-[#888888]">Sesi Aktif</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+          <p className="mono-label text-[#74796d]">Sesi Aktif</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
             Anda sudah masuk.
           </h2>
-          <p className="mt-3 text-sm leading-7 text-[#666666]">
+          <p className="mt-3 text-sm leading-7 text-[#44483e]">
             Logout jika Anda ingin masuk dengan akun lain.
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] px-5 py-4">
-          <p className="text-sm font-medium text-[#0d0d0d]">
+        <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-[#f4f4ed] px-5 py-4">
+          <p className="text-sm font-medium text-[#1a1c18]">
             Akun aktif: {session.username} ({roleLabels[session.role]})
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link href="/">
-            <Button>
-              Kembali
+          <Button asChild>
+            <Link href="/dashboard">
+              Dashboard
               <ArrowRight className="size-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <Button
             type="button"
             variant="secondary"
@@ -124,7 +133,7 @@ export function LoginForm() {
         </div>
 
         {error ? (
-          <p className="rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+          <p className="rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
             {error}
           </p>
         ) : null}
@@ -135,18 +144,18 @@ export function LoginForm() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mono-label text-[#888888]">Masuk</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+        <p className="mono-label text-[#74796d]">Masuk</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
           Masuk ke akun Anda.
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#666666]">
+        <p className="mt-3 text-sm leading-7 text-[#44483e]">
           Masukkan email dan password Anda.
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-[#333333]" htmlFor="email">
+          <label className="text-sm font-medium text-[#44483e]" htmlFor="email">
             Email
           </label>
           <Input
@@ -161,7 +170,7 @@ export function LoginForm() {
 
         <div className="space-y-2">
           <label
-            className="text-sm font-medium text-[#333333]"
+            className="text-sm font-medium text-[#44483e]"
             htmlFor="password"
           >
             Password
@@ -182,20 +191,20 @@ export function LoginForm() {
       </form>
 
       {feedback ? (
-        <p className="rounded-[1.3rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] px-4 py-3 text-sm text-[#0d0d0d]">
+        <p className="rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] px-4 py-3 text-sm text-[#1a1c18]">
           {feedback}
         </p>
       ) : null}
 
       {error || sessionError ? (
-        <p className="rounded-[1.3rem] border border-[rgba(212,86,86,0.25)] bg-[rgba(212,86,86,0.06)] px-4 py-3 text-sm text-[#a54141]">
+        <p className="rounded-lg border border-[rgba(186,26,26,0.25)] bg-[rgba(186,26,26,0.06)] px-4 py-3 text-sm text-[#93000a]">
           {error ?? sessionError}
         </p>
       ) : null}
 
-      <p className="text-sm leading-7 text-[#666666]">
+      <p className="text-sm leading-7 text-[#44483e]">
         Belum punya akun?{" "}
-        <Link className="font-medium text-[#0fa76e]" href="/register">
+        <Link className="font-medium text-[#3f6901]" href="/register">
           Buat akun
         </Link>
         .

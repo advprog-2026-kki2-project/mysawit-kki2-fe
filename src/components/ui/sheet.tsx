@@ -60,15 +60,15 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-white text-[#0d0d0d] shadow-[0_2px_4px_rgba(13,13,13,0.03)] transition ease-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
+          "fixed z-50 flex flex-col gap-4 bg-white text-[#1a1c18] shadow-[0_18px_44px_rgba(119,78,21,0.08)] transition ease-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
           side === "right" &&
-            "inset-y-0 right-0 h-full w-[min(92vw,30rem)] rounded-l-[1.5rem] border-l border-y border-[rgba(13,13,13,0.05)] data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+            "inset-y-0 right-0 h-full w-[min(92vw,30rem)] rounded-l-[1.5rem] border-l border-y border-[rgba(116,121,109,0.24)] data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
           side === "left" &&
-            "inset-y-0 left-0 h-full w-[min(92vw,30rem)] rounded-r-[1.5rem] border-r border-y border-[rgba(13,13,13,0.05)] data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+            "inset-y-0 left-0 h-full w-[min(92vw,30rem)] rounded-r-[1.5rem] border-r border-y border-[rgba(116,121,109,0.24)] data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
           side === "top" &&
-            "inset-x-3 top-3 h-auto rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top sm:inset-x-6",
+            "inset-x-3 top-3 h-auto rounded-lg border border-[rgba(116,121,109,0.24)] data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top sm:inset-x-6",
           side === "bottom" &&
-            "inset-x-3 bottom-3 h-auto rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:inset-x-6",
+            "inset-x-3 bottom-3 h-auto rounded-lg border border-[rgba(116,121,109,0.24)] data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:inset-x-6",
           className
         )}
         {...props}
@@ -76,7 +76,7 @@ function SheetContent({
         {children}
         {showCloseButton && (
           <SheetPrimitive.Close
-            className="absolute top-4 right-4 inline-flex size-9 items-center justify-center rounded-full border border-[rgba(13,13,13,0.05)] bg-white text-[#666666] transition-[border-color,color,box-shadow] hover:border-[rgba(13,13,13,0.08)] hover:text-[#0d0d0d] focus-visible:border-[#18E299] focus-visible:ring-2 focus-visible:ring-[#18E299]/20 focus-visible:outline-none disabled:pointer-events-none"
+            className="absolute top-4 right-4 inline-flex size-9 items-center justify-center rounded-lg border border-[rgba(116,121,109,0.24)] bg-white text-[#44483e] transition-[border-color,color,box-shadow] hover:border-[rgba(116,121,109,0.34)] hover:text-[#1a1c18] focus-visible:border-[#3f6901] focus-visible:ring-2 focus-visible:ring-[#3f6901]/20 focus-visible:outline-none disabled:pointer-events-none"
           >
             <XIcon className="size-4" />
             <span className="sr-only">Close</span>
@@ -115,7 +115,7 @@ function SheetTitle({
     <SheetPrimitive.Title
       data-slot="sheet-title"
       className={cn(
-        "text-[1.5rem] font-semibold tracking-[-0.015em] text-[#0d0d0d]",
+        "text-[1.5rem] font-semibold tracking-[-0.015em] text-[#1a1c18]",
         className
       )}
       {...props}
@@ -130,7 +130,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-sm leading-6 text-[#666666]", className)}
+      className={cn("text-sm leading-6 text-[#44483e]", className)}
       {...props}
     />
   )

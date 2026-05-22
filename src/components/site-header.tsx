@@ -62,17 +62,17 @@ export function SiteHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b border-[rgba(13,13,13,0.05)] bg-white/85 backdrop-blur-xl",
+        "sticky top-0 z-50 border-b border-[rgba(116,121,109,0.24)] bg-[#fafaf2]/90 backdrop-blur-xl",
         className,
       )}
     >
       <div className="mx-auto flex h-18 w-full max-w-6xl items-center justify-between gap-4 px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="inline-flex size-9 items-center justify-center rounded-full border border-[rgba(13,13,13,0.08)] bg-white text-sm font-semibold text-[#0d0d0d] shadow-[0_1px_2px_rgba(13,13,13,0.04)]">
+          <span className="inline-flex size-9 items-center justify-center rounded-lg bg-[#2b4316] font-[var(--font-syne)] text-sm font-bold text-white shadow-[0_8px_20px_rgba(43,67,22,0.14)]">
             M
           </span>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-[#0d0d0d]">
+            <span className="font-[var(--font-syne)] text-sm font-bold text-[#1a1c18]">
               Mysawit
             </span>
           </div>
@@ -83,7 +83,7 @@ export function SiteHeader({
             <Link
               key={link.label}
               href={link.href}
-              className="text-sm text-[#666666] transition-colors hover:text-[#18E299]"
+              className="text-sm text-[#44483e] transition-colors hover:text-[#3f6901]"
             >
               {link.label}
             </Link>
@@ -93,8 +93,8 @@ export function SiteHeader({
         <div className="flex items-center gap-2">
           {activeSession ? (
             <>
-              <div className="hidden rounded-full border border-[rgba(13,13,13,0.06)] bg-white px-4 py-2 text-right md:block">
-                <p className="text-sm font-medium text-[#0d0d0d]">
+              <div className="hidden rounded-lg border border-[rgba(116,121,109,0.28)] bg-white px-4 py-2 text-right md:block">
+                <p className="text-sm font-medium text-[#1a1c18]">
                   {activeSession.username} · {roleLabels[activeSession.role]}
                 </p>
               </div>
