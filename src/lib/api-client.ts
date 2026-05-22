@@ -1,5 +1,23 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8080";
+function resolveApiBaseUrl() {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8080";
+
+  if (typeof window === "undefined" || window.location.protocol !== "https:") {
+    return configuredUrl;
+  }
+
+  const url = new URL(configuredUrl);
+  const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+
+  if (url.protocol === "http:" && !isLocalhost) {
+    url.protocol = "https:";
+    return url.toString().replace(/\/$/, "");
+  }
+
+  return configuredUrl;
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 type ApiErrorPayload = {
   error?: string;
