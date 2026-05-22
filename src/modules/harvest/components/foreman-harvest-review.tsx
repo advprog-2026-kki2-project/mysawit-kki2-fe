@@ -37,6 +37,7 @@ import {
   getForemanHarvests,
   rejectHarvest,
 } from "@/modules/harvest/data/harvest-api";
+import { HarvestPhotoThumb } from "@/modules/harvest/components/harvest-photo-thumb";
 import type { HarvestRecord } from "@/modules/harvest/data/types";
 
 const statusBadgeClass: Record<string, string> = {
@@ -102,16 +103,11 @@ function HarvestPhotoPreview({ record }: { record: HarvestRecord }) {
   const photos = photoPathsOf(record);
 
   return (
-    <div className="relative flex min-h-32 items-center justify-center overflow-hidden rounded-lg border border-[rgba(116,121,109,0.18)] bg-[linear-gradient(135deg,#eff4e8,#f8efe6)] sm:min-h-36">
-      <div className="absolute inset-0 opacity-45 [background-image:linear-gradient(90deg,rgba(65,91,43,0.12)_1px,transparent_1px),linear-gradient(rgba(65,91,43,0.12)_1px,transparent_1px)] [background-size:18px_18px]" />
-      <div className="relative z-10 flex flex-col items-center gap-2 text-[#2b4316]">
-        <span className="inline-flex size-12 items-center justify-center rounded-full bg-white/80 shadow-sm">
-          <ImageIcon className="size-5" />
-        </span>
-        <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-bold">
-          {photos.length} bukti foto
-        </span>
-      </div>
+    <div className="relative">
+      <HarvestPhotoThumb record={record} scope="foreman" className="min-h-32 sm:min-h-36" />
+      <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-[#2b4316] shadow-sm">
+        {photos.length} bukti foto
+      </span>
     </div>
   );
 }
@@ -578,10 +574,13 @@ export function ForemanHarvestReview() {
                       </p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {photoPathsOf(record).map((path, index) => (
-                          <Badge key={`${record.id}-profile-${path}`} variant="muted">
-                            <ImageIcon className="mr-1 size-3" />
-                            Foto {index + 1}
-                          </Badge>
+                          <HarvestPhotoThumb
+                            key={`${record.id}-profile-${path}`}
+                            record={record}
+                            index={index}
+                            scope="foreman"
+                            className="h-24 w-32 min-h-0"
+                          />
                         ))}
                       </div>
                       {record.rejectionReason ? (

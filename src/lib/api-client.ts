@@ -152,6 +152,16 @@ export async function requestFormData<T>(
   return (await response.json()) as T;
 }
 
+export async function requestBlob(path: string, init?: RequestInit): Promise<Blob> {
+  const response = await fetchApi(path, init);
+
+  if (!response.ok) {
+    throw new ApiError(await parseError(response), response.status);
+  }
+
+  return response.blob();
+}
+
 export async function requestEmpty(path: string, init?: RequestInit) {
   const response = await fetchApi(path, init, Boolean(init?.body));
 

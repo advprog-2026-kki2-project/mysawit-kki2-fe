@@ -1,4 +1,4 @@
-import { requestFormData, requestJson } from "@/lib/api-client";
+import { requestBlob, requestFormData, requestJson } from "@/lib/api-client";
 import type {
   ForemanHarvestFilters,
   HarvestRecord,
@@ -57,5 +57,17 @@ export function rejectHarvest(harvestId: string, reason: string) {
   return requestJson<{ message: string }>(`/api/foreman/harvests/${harvestId}/reject`, {
     method: "POST",
     body: JSON.stringify({ reason }),
+  });
+}
+
+export function getLaborerHarvestPhoto(harvestId: string, photoIndex: number) {
+  return requestBlob(`/api/harvests/${harvestId}/photos/${photoIndex}`, {
+    method: "GET",
+  });
+}
+
+export function getForemanHarvestPhoto(harvestId: string, photoIndex: number) {
+  return requestBlob(`/api/foreman/harvests/${harvestId}/photos/${photoIndex}`, {
+    method: "GET",
   });
 }
