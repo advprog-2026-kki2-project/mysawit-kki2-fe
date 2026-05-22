@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { getDeliveryById } from '../../mockData';
-import { StatusTimeline } from '../../components/StatusTimeline';
-import { StatusBadge } from '../../components/StatusBadge';
-import { formatDate, isDeliveryInTransit } from '../../deliveryUtils';
+import { getDeliveryById } from '../mockData';
+import { StatusTimeline } from '../components/StatusTimeline';
+import { StatusBadge } from '../components/StatusBadge';
+import { formatDate, isDeliveryInTransit } from '../deliveryUtils';
+import type { HarvestItem } from '../types';
 import Link from 'next/link';
 
-export default function DriverDeliveryDetailPage() {
+export function DriverDeliveryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const deliveryId = params.id as string;
@@ -122,7 +123,7 @@ export default function DriverDeliveryDetailPage() {
                 Harvest Items ({delivery.harvestItems.length})
               </h3>
               <div className="space-y-3">
-                {delivery.harvestItems.map((item) => (
+                {delivery.harvestItems.map((item: HarvestItem) => (
                   <div
                     key={item.id}
                     className="flex justify-between items-center p-4 bg-[#FFFFF1] rounded-lg border border-[#DADAD3]"
@@ -223,3 +224,5 @@ export default function DriverDeliveryDetailPage() {
     </div>
   );
 }
+
+export default DriverDeliveryDetailPage;

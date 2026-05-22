@@ -1,20 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { getApprovedDeliveries, mockDeliveries } from '../../mockData';
-import { useDeliveryFilters } from '../../hooks/useDeliveryFilters';
-import { DeliveryCard } from '../../components/DeliveryCard';
+import { getApprovedDeliveries, mockDeliveries } from '../mockData';
+import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
+import { DeliveryCard } from '../components/DeliveryCard';
+import type { Delivery } from '../types';
 import Link from 'next/link';
 import { Calendar, Search } from 'lucide-react';
 
-export default function AdminDeliveriesPage() {
+export function AdminDeliveriesPage() {
   const deliveries = mockDeliveries; // Admin sees all deliveries
   const { filteredDeliveries, searchTerm, setSearchTerm, filters, setFilters } =
-    useDeliveryFilters(deliveries);
+    useDeliveryFilters(deliveries as Delivery[]);
 
-  const approvedCount = deliveries.filter((d) => d.approvalStatus === 'Approved').length;
-  const rejectedCount = deliveries.filter((d) => d.approvalStatus === 'Rejected').length;
-  const pendingCount = deliveries.filter((d) => d.approvalStatus === 'Pending').length;
+  const approvedCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Approved').length;
+  const rejectedCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Rejected').length;
+  const pendingCount = deliveries.filter((d: Delivery) => d.approvalStatus === 'Pending').length;
 
   return (
     <div className="min-h-screen bg-[#FFFFF1]">
@@ -192,3 +193,5 @@ export default function AdminDeliveriesPage() {
     </div>
   );
 }
+
+export default AdminDeliveriesPage;

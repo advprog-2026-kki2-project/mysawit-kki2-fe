@@ -1,23 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { getDeliveriesByDriver } from '../../mockData';
-import { useDeliveryFilters } from '../../hooks/useDeliveryFilters';
-import { DeliveryCard } from '../../components/DeliveryCard';
-import { isDeliveryInTransit } from '../../deliveryUtils';
+import { getDeliveriesByDriver } from '../mockData';
+import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
+import { DeliveryCard } from '../components/DeliveryCard';
+import { isDeliveryInTransit } from '../deliveryUtils';
+import type { Delivery } from '../types';
 import Link from 'next/link';
 
-export default function DriverActiveDeliveriesPage() {
+export function DriverActiveDeliveriesPage() {
   // Mock driver ID - in real app, get from auth context
   const driverId = 'driver-001';
   const allDeliveries = getDeliveriesByDriver(driverId);
 
   // Separate active from completed
   const activeDeliveries = allDeliveries.filter(
-    (d) => d.status === 'Loading' || d.status === 'Transporting'
+    (d: Delivery) => d.status === 'Loading' || d.status === 'Transporting'
   );
   const completedDeliveries = allDeliveries.filter(
-    (d) => d.status === 'Arrived' || d.approvalStatus === 'Approved' || d.approvalStatus === 'Rejected'
+    (d: Delivery) => d.status === 'Arrived' || d.approvalStatus === 'Approved' || d.approvalStatus === 'Rejected'
   );
 
   return (
@@ -45,7 +46,7 @@ export default function DriverActiveDeliveriesPage() {
             </div>
 
             <div className="space-y-4">
-              {activeDeliveries.map((delivery) => (
+              {activeDeliveries.map((delivery: Delivery) => (
                 <Link
                   key={delivery.id}
                   href={`/transport/driver/deliveries/${delivery.id}`}
@@ -102,7 +103,7 @@ export default function DriverActiveDeliveriesPage() {
 
           {completedDeliveries.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {completedDeliveries.map((delivery) => (
+              {completedDeliveries.map((delivery: Delivery) => (
                 <Link
                   key={delivery.id}
                   href={`/transport/driver/deliveries/${delivery.id}`}
@@ -122,3 +123,8 @@ export default function DriverActiveDeliveriesPage() {
     </div>
   );
 }
+
+export default DriverActiveDeliveriesPage;
+
+// Provide legacy named export expected by some route wrappers
+export const DriverActivePage = DriverActiveDeliveriesPage;

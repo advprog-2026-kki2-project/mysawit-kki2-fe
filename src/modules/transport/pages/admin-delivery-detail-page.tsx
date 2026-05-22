@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { getDeliveryById } from '../../mockData';
-import { StatusTimeline } from '../../components/StatusTimeline';
-import { StatusBadge } from '../../components/StatusBadge';
-import { RejectModal } from '../../components/RejectModal';
-import { formatDate } from '../../deliveryUtils';
+import { getDeliveryById } from '../mockData';
+import { StatusTimeline } from '../components/StatusTimeline';
+import { StatusBadge } from '../components/StatusBadge';
+import { RejectModal } from '../components/RejectModal';
+import { formatDate } from '../deliveryUtils';
+import type { Delivery, HarvestItem } from '../types';
 import Link from 'next/link';
 
-export default function AdminDeliveryDetailPage() {
+export function AdminDeliveryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const deliveryId = params.id as string;
@@ -170,7 +171,7 @@ export default function AdminDeliveryDetailPage() {
                 Harvest Items ({delivery.harvestItems.length})
               </h3>
               <div className="space-y-3">
-                {delivery.harvestItems.map((item) => (
+                {delivery.harvestItems.map((item: HarvestItem) => (
                   <div
                     key={item.id}
                     className="flex justify-between items-center p-4 bg-[#FFFFF1] rounded-lg border border-[#DADAD3]"
@@ -300,3 +301,5 @@ export default function AdminDeliveryDetailPage() {
     </div>
   );
 }
+
+export default AdminDeliveryDetailPage;

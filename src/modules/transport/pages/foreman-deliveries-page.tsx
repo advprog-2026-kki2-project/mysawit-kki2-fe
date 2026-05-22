@@ -2,17 +2,18 @@
 
 import { useState } from 'react';
 import { Eye } from 'lucide-react';
-import { getDeliveriesByForeman } from '../../mockData';
-import { useDeliveryFilters } from '../../hooks/useDeliveryFilters';
-import { DeliveryCard } from '../../components/DeliveryCard';
+import { getDeliveriesByForeman } from '../mockData';
+import { useDeliveryFilters } from '../hooks/useDeliveryFilters';
+import { DeliveryCard } from '../components/DeliveryCard';
+import type { Delivery } from '../types';
 import Link from 'next/link';
 
-export default function ForemanDeliveriesPage() {
+export function ForemanDeliveriesPage() {
   // Mock foreman ID - in real app, get from auth context
   const foremanId = 'foreman-001';
   const deliveries = getDeliveriesByForeman(foremanId);
   const { filteredDeliveries, searchTerm, setSearchTerm, filters, setFilters } =
-    useDeliveryFilters(deliveries);
+    useDeliveryFilters(deliveries as Delivery[]);
 
   return (
     <div className="min-h-screen bg-[#FFFFF1]">
@@ -88,7 +89,7 @@ export default function ForemanDeliveriesPage() {
         {/* Deliveries Grid */}
         {filteredDeliveries.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredDeliveries.map((delivery) => (
+                {filteredDeliveries.map((delivery: Delivery) => (
               <Link
                 key={delivery.id}
                 href={`/transport/foreman/deliveries/${delivery.id}`}
@@ -110,3 +111,5 @@ export default function ForemanDeliveriesPage() {
     </div>
   );
 }
+
+export default ForemanDeliveriesPage;
