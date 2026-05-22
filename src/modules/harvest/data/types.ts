@@ -12,28 +12,31 @@ export type HarvestSubmissionResult = {
   harvestDate: string;
   weightKg: number;
   notes: string;
+  photoPaths: string[];
   status: string;
-  photoUrls: string[];
 };
 
-export type DailyHarvest = {
+export type HarvestRecord = {
   id: string;
   laborerName: string;
   harvestDate: string;
   weightKg: number;
   notes: string;
-  photoUrls: string[];
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  photoPath: string;
+  photoPaths: string[];
+  status: string;
   rejectionReason: string | null;
   reviewedBy: string | null;
   reviewedAt: string | null;
 };
 
-export type RejectHarvestPayload = {
-  reason: string;
+export type LaborerHarvestFilters = {
+  status?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
-export type ActionResponse = {
-  message?: string;
-  error?: string;
+export type ForemanHarvestFilters = {
+  laborerName?: string;
+  harvestDate?: string;
 };

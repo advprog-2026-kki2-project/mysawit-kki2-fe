@@ -3,6 +3,23 @@ export type PlantationCoordinate = {
   y: number;
 };
 
+export type Plantation = {
+  plantationId: string;
+  plantationCode: string;
+  plantationName: string;
+  areaHectares: number;
+  corners: PlantationCoordinate[];
+  assignedForemanIds: string[];
+  assignedDriverIds: string[];
+};
+
+export type PlantationPayload = {
+  plantationCode: string;
+  plantationName: string;
+  areaHectares: number;
+  corners: PlantationCoordinate[];
+};
+
 export type Foreman = {
   foremanId: string;
   foremanName: string;
@@ -13,23 +30,4 @@ export type Driver = {
   driverId: string;
   driverName: string;
   licenseNumber: string;
-};
-
-export type Plantation = {
-  plantationId: string;
-  plantationCode: string;
-  plantationName: string;
-  areaHectares: number;
-  corners: PlantationCoordinate[];
-  assignedForemanIds?: string[];
-  assignedDriverIds?: string[];
-};
-
-export type PlantationPayload = {
-  plantationCode: string;
-  plantationName: string;
-  areaHectares: number;
-  corners: PlantationCoordinate[];
-  assignedForemanIds?: string[];
-  assignedDriverIds?: string[];
 };

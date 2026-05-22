@@ -1,20 +1,17 @@
-import { requestFormData } from "@/lib/api-client";
+import { requestFormData, requestJson } from "@/lib/api-client";
 import type {
-  ActionResponse,
-  DailyHarvest,
+  ForemanHarvestFilters,
+  HarvestRecord,
   HarvestSubmissionPayload,
   HarvestSubmissionResult,
-  RejectHarvestPayload,
+  LaborerHarvestFilters,
 } from "@/modules/harvest/data/types";
-
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
 
 export function submitHarvest(payload: HarvestSubmissionPayload) {
   const formData = new FormData();
   formData.append("harvestDate", payload.harvestDate);
   formData.append("weightKg", payload.weightKg);
   formData.append("notes", payload.notes);
-
   payload.photos.forEach((photo) => {
     formData.append("photos", photo);
   });
@@ -24,84 +21,41 @@ export function submitHarvest(payload: HarvestSubmissionPayload) {
   });
 }
 
-export async function getLaborerHistory(
-  status?: string,
-  startDate?: string,
-  endDate?: string
-): Promise<DailyHarvest[]> {
+function buildQuery(filters: Record<string, string | undefined>) {
   const params = new URLSearchParams();
-  if (status) params.append("status", status);
-  if (startDate) params.append("startDate", startDate);
-  if (endDate) params.append("endDate", endDate);
-
-  const url = `/api/harvests/history?${params.toString()}`;
-
-  const response = await fetch(API_BASE_URL + url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value?.trim()) {
+      params.set(key, value.trim());
+    }
   });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch history");
-  }
-
-  return response.json();
+  const query = params.toString();
+  return query ? `?${query}` : "";
 }
 
-export async function getForemanQueue(
-  laborerName?: string,
-  harvestDate?: string
-): Promise<DailyHarvest[]> {
-  const params = new URLSearchParams();
-  if (laborerName) params.append("laborerName", laborerName);
-  if (harvestDate) params.append("harvestDate", harvestDate);
-
-  const url = `/api/foreman/harvests?${params.toString()}`;
-
-  const response = await fetch(API_BASE_URL + url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch queue");
-  }
-
-  return response.json();
+export function getLaborerHarvestHistory(filters: LaborerHarvestFilters) {
+  return requestJson<HarvestRecord[]>(
+    `/api/harvests/history${buildQuery(filters)}`,
+    { method: "GET" },
+  );
 }
 
-export async function approveHarvest(id: string): Promise<ActionResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/foreman/harvests/${id}/approve`, {
+export function getForemanHarvests(filters: ForemanHarvestFilters) {
+  return requestJson<HarvestRecord[]>(
+    `/api/foreman/harvests${buildQuery(filters)}`,
+    { method: "GET" },
+  );
+}
+
+export function approveHarvest(harvestId: string) {
+  return requestJson<{ message: string }>(`/api/foreman/harvests/${harvestId}/approve`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
+    body: JSON.stringify({}),
   });
-
-  if (!response.ok) throw new Error("Failed to approve harvest");
-  return response.json();
 }
 
-export async function rejectHarvest(
-  id: string,
-  payload: RejectHarvestPayload
-): Promise<ActionResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/foreman/harvests/${id}/reject`, {
+export function rejectHarvest(harvestId: string, reason: string) {
+  return requestJson<{ message: string }>(`/api/foreman/harvests/${harvestId}/reject`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ reason }),
   });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || "Failed to reject harvest");
-  }
-
-  return response.json();
 }

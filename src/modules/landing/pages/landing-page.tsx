@@ -16,29 +16,17 @@ import {
   workflowSteps,
 } from "../data/content";
 
-function getRoleRoute(role: string) {
-  if (role === "ADMIN") {
-    return "/plantations";
-  }
-
-  if (role === "LABORER") {
-    return "/harvest";
-  }
-
-  return null;
-}
-
 export function LandingPage() {
   const { session, isLoading } = useAuthSession();
   const sessionRoleLabel = session ? roleLabels[session.role] : null;
-  const roleRoute = session ? getRoleRoute(session.role) : null;
+  const roleRoute = session ? "/dashboard" : null;
   const sessionNavLinks = session
     ? [
         { href: "#overview", label: "Overview" },
         roleRoute
           ? {
               href: roleRoute,
-              label: session.role === "ADMIN" ? "Plantations" : "Panen",
+              label: "Dashboard",
             }
           : { href: "#roles", label: "Roles" },
       ]
@@ -49,7 +37,7 @@ export function LandingPage() {
       <SiteHeader navLinks={sessionNavLinks} />
 
       <main>
-        <section className="hero-atmosphere border-b border-[rgba(13,13,13,0.05)]">
+        <section className="hero-atmosphere border-b border-[rgba(116,121,109,0.24)]">
           <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
               <div className="max-w-2xl">
@@ -57,7 +45,7 @@ export function LandingPage() {
                 <h1 className="display-title mt-7 text-[3.25rem] sm:text-[4.5rem] lg:text-[5.75rem]">
                   Kelola panen, angkut, dan approval.
                 </h1>
-                <p className="mt-6 max-w-xl text-base leading-7 text-[#666666] sm:text-lg">
+                <p className="mt-6 max-w-xl text-base leading-7 text-[#44483e] sm:text-lg">
                   {isLoading
                     ? "Memeriksa sesi akun Anda."
                     : session
@@ -70,11 +58,7 @@ export function LandingPage() {
                     <>
                       <Link href={roleRoute ?? "#roles"}>
                         <Button size="lg">
-                          {session.role === "ADMIN"
-                            ? "Kelola plantation"
-                            : session.role === "LABORER"
-                              ? "Catat panen"
-                              : "Lihat role kerja"}
+                          Buka dashboard
                           <ArrowRight />
                         </Button>
                       </Link>
@@ -107,58 +91,58 @@ export function LandingPage() {
                   {landingStats.map((item) => (
                     <div
                       key={item.label}
-                      className="surface-card rounded-[1.5rem] px-4 py-5 text-center"
+                      className="surface-card rounded-lg px-4 py-5 text-center"
                     >
-                      <p className="text-2xl font-semibold tracking-[-0.04em] text-[#0d0d0d] sm:text-3xl">
+                      <p className="text-2xl font-semibold tracking-[-0.04em] text-[#1a1c18] sm:text-3xl">
                         {item.value}
                       </p>
-                      <p className="mt-2 text-sm text-[#666666]">{item.label}</p>
+                      <p className="mt-2 text-sm text-[#44483e]">{item.label}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="surface-panel rounded-[2rem] p-4 sm:p-5">
+              <div className="surface-panel rounded-lg p-4 sm:p-5">
                 <div className="grid gap-4">
                   {session ? (
-                    <div className="rounded-[1.5rem] border border-[rgba(24,226,153,0.18)] bg-[rgba(212,250,232,0.55)] p-6 sm:p-7">
-                      <p className="mono-label text-[#0fa76e]">Sesi</p>
-                      <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+                    <div className="rounded-lg border border-[rgba(63,105,1,0.18)] bg-[rgba(205,237,174,0.55)] p-6 sm:p-7">
+                      <p className="mono-label text-[#3f6901]">Sesi</p>
+                      <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
                         Akun Anda sudah terhubung ke backend.
                       </h2>
-                      <p className="mt-3 max-w-md text-sm leading-7 text-[#666666]">
+                      <p className="mt-3 max-w-md text-sm leading-7 text-[#44483e]">
                         Lanjutkan menggunakan role {sessionRoleLabel?.toLowerCase()}.
                       </p>
                     </div>
                   ) : null}
-                  <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-[#fcfffe] p-6 sm:p-7">
-                    <p className="mono-label text-[#888888]">Workflow</p>
+                  <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-[#f4f4ed] p-6 sm:p-7">
+                    <p className="mono-label text-[#74796d]">Workflow</p>
                     <div className="mt-5 grid gap-3">
                       {workflowSteps.map((step, index) => (
                         <div
                           key={step}
-                          className="flex items-center justify-between rounded-[1.25rem] border border-[rgba(13,13,13,0.05)] bg-white px-4 py-3"
+                          className="flex items-center justify-between rounded-lg border border-[rgba(116,121,109,0.24)] bg-white px-4 py-3"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#d4fae8] text-sm font-medium text-[#0fa76e]">
+                            <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#cdedae] text-sm font-medium text-[#3f6901]">
                               0{index + 1}
                             </span>
-                            <span className="text-sm font-medium text-[#333333]">
+                            <span className="text-sm font-medium text-[#44483e]">
                               {step}
                             </span>
                           </div>
-                          <Check className="size-4 text-[#18E299]" />
+                          <Check className="size-4 text-[#3f6901]" />
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-6 sm:p-7">
-                    <p className="mono-label text-[#888888]">Status</p>
-                    <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
+                  <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-6 sm:p-7">
+                    <p className="mono-label text-[#74796d]">Status</p>
+                    <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[#1a1c18]">
                       Pantau pekerjaan per tahap.
                     </h2>
-                    <p className="mt-3 max-w-md text-sm leading-7 text-[#666666]">
+                    <p className="mt-3 max-w-md text-sm leading-7 text-[#44483e]">
                       Lihat progres tanpa berpindah halaman.
                     </p>
                   </div>
@@ -170,22 +154,22 @@ export function LandingPage() {
 
         <section
           id="overview"
-          className="border-b border-[rgba(13,13,13,0.05)]"
+          className="border-b border-[rgba(116,121,109,0.24)]"
         >
           <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
             <div className="grid gap-6 lg:grid-cols-3">
               {featureCards.map(({ icon: Icon, title, body }) => (
                 <article
                   key={title}
-                  className="surface-card rounded-[1.75rem] p-6 sm:p-7"
+                  className="surface-card rounded-lg p-6 sm:p-7"
                 >
-                  <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#d4fae8] text-[#0fa76e]">
+                  <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[#cdedae] text-[#3f6901]">
                     <Icon className="size-5" />
                   </div>
-                  <h2 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-[#0d0d0d]">
+                  <h2 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-[#1a1c18]">
                     {title}
                   </h2>
-                  <p className="mt-3 max-w-xs text-sm leading-7 text-[#666666]">
+                  <p className="mt-3 max-w-xs text-sm leading-7 text-[#44483e]">
                     {body}
                   </p>
                 </article>
@@ -194,10 +178,10 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="roles" className="border-b border-[rgba(13,13,13,0.05)]">
+        <section id="roles" className="border-b border-[rgba(116,121,109,0.24)]">
           <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
             <div className="flex flex-col gap-4 sm:max-w-xl">
-              <p className="mono-label text-[#888888]">Role</p>
+              <p className="mono-label text-[#74796d]">Role</p>
               <h2 className="display-title text-[2.5rem] sm:text-[3.4rem]">
                 Gunakan akses sesuai tugas.
               </h2>
@@ -207,15 +191,15 @@ export function LandingPage() {
               {roleCards.map(({ icon: Icon, title, body }) => (
                 <article
                   key={title}
-                  className="surface-card rounded-[1.5rem] p-6"
+                  className="surface-card rounded-lg p-6"
                 >
-                  <div className="inline-flex size-11 items-center justify-center rounded-2xl border border-[rgba(13,13,13,0.05)] bg-white text-[#0d0d0d]">
+                  <div className="inline-flex size-11 items-center justify-center rounded-2xl border border-[rgba(116,121,109,0.24)] bg-white text-[#1a1c18]">
                     <Icon className="size-5" />
                   </div>
-                  <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-[#0d0d0d]">
+                  <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-[#1a1c18]">
                     {title}
                   </h3>
-                  <p className="mt-2 text-sm leading-7 text-[#666666]">{body}</p>
+                  <p className="mt-2 text-sm leading-7 text-[#44483e]">{body}</p>
                 </article>
               ))}
             </div>
@@ -223,10 +207,10 @@ export function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
-          <div className="surface-panel rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10">
+          <div className="surface-panel rounded-lg px-6 py-8 sm:px-8 sm:py-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
-                <p className="mono-label text-[#888888]">Akses Akun</p>
+                <p className="mono-label text-[#74796d]">Akses Akun</p>
                 <h2 className="display-title mt-4 text-[2.3rem] sm:text-[3rem]">
                   Masuk atau buat akun.
                 </h2>

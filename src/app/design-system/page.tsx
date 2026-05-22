@@ -57,16 +57,16 @@ const componentSections = [
       "Use separators to group related content.",
     content: (
       <div className="space-y-5">
-        <div className="flex items-center justify-between gap-4 text-sm text-[#333333]">
+        <div className="flex items-center justify-between gap-4 text-sm text-[#44483e]">
           <span>Hero section</span>
-          <span className="mono-label text-[0.65rem] text-[#888888]">
+          <span className="mono-label text-[0.65rem] text-[#74796d]">
             Display + CTA
           </span>
         </div>
         <Separator />
-        <div className="flex items-center justify-between gap-4 text-sm text-[#333333]">
+        <div className="flex items-center justify-between gap-4 text-sm text-[#44483e]">
           <span>Feature section</span>
-          <span className="mono-label text-[0.65rem] text-[#888888]">
+          <span className="mono-label text-[0.65rem] text-[#74796d]">
             Cards + grid
           </span>
         </div>
@@ -84,7 +84,7 @@ export default function DesignSystemPage() {
         <div className="flex flex-col gap-8">
           <Link
             href="/"
-            className="mono-label inline-flex w-fit items-center gap-2 text-[#888888] transition-colors hover:text-[#18E299]"
+            className="mono-label inline-flex w-fit items-center gap-2 text-[#74796d] transition-colors hover:text-[#3f6901]"
           >
             <ArrowLeft className="size-4" />
             Back to home
@@ -97,7 +97,7 @@ export default function DesignSystemPage() {
                 Review shared components.
               </h1>
             </div>
-            <p className="max-w-xl text-base leading-7 text-[#666666]">
+            <p className="max-w-xl text-base leading-7 text-[#44483e]">
               Use this page to check shared UI patterns and form copy.
             </p>
           </div>
@@ -107,19 +107,19 @@ export default function DesignSystemPage() {
           {componentSections.map((section) => (
             <section
               key={section.title}
-              className="surface-panel rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10"
+              className="surface-panel rounded-lg px-6 py-8 sm:px-8 sm:py-10"
             >
               <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
                 <div className="space-y-4">
-                  <p className="mono-label text-[#888888]">{section.label}</p>
+                  <p className="mono-label text-[#74796d]">{section.label}</p>
                   <h2 className="display-title text-[2.2rem] sm:text-[2.75rem]">
                     {section.title}
                   </h2>
-                  <p className="max-w-md text-sm leading-7 text-[#666666]">
+                  <p className="max-w-md text-sm leading-7 text-[#44483e]">
                     {section.description}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[rgba(13,13,13,0.05)] bg-white p-5 sm:p-6">
+                <div className="rounded-lg border border-[rgba(116,121,109,0.24)] bg-white p-5 sm:p-6">
                   {section.content}
                 </div>
               </div>
@@ -127,10 +127,10 @@ export default function DesignSystemPage() {
           ))}
         </div>
 
-        <section className="surface-panel mt-8 rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10">
+        <section className="surface-panel mt-8 rounded-lg px-6 py-8 sm:px-8 sm:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="mono-label text-[#888888]">Next step</p>
+              <p className="mono-label text-[#74796d]">Next step</p>
               <h2 className="display-title mt-4 max-w-[10ch] text-[2.4rem] sm:text-[3rem]">
                 Return to the main pages.
               </h2>
