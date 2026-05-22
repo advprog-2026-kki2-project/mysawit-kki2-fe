@@ -42,8 +42,8 @@ export function LandingPage() {
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
               <div className="max-w-2xl">
                 <Badge>Mysawit</Badge>
-                <h1 className="display-title mt-7 text-[3.25rem] sm:text-[4.5rem] lg:text-[5.75rem]">
-                  Kelola panen, angkut, dan approval.
+                <h1 className="display-title mt-7 text-5xl max-md:text-4xl">
+                  Kelola panen, angkut, dan approval
                 </h1>
                 <p className="mt-6 max-w-xl text-base leading-7 text-[#44483e] sm:text-lg">
                   {isLoading
@@ -96,7 +96,9 @@ export function LandingPage() {
                       <p className="text-2xl font-semibold tracking-[-0.04em] text-[#1a1c18] sm:text-3xl">
                         {item.value}
                       </p>
-                      <p className="mt-2 text-sm text-[#44483e]">{item.label}</p>
+                      <p className="mt-2 text-sm text-[#44483e]">
+                        {item.label}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -111,7 +113,8 @@ export function LandingPage() {
                         Akun Anda sudah terhubung ke backend.
                       </h2>
                       <p className="mt-3 max-w-md text-sm leading-7 text-[#44483e]">
-                        Lanjutkan menggunakan role {sessionRoleLabel?.toLowerCase()}.
+                        Lanjutkan menggunakan role{" "}
+                        {sessionRoleLabel?.toLowerCase()}.
                       </p>
                     </div>
                   ) : null}
@@ -178,28 +181,30 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="roles" className="border-b border-[rgba(116,121,109,0.24)]">
+        <section
+          id="roles"
+          className="border-b border-[rgba(116,121,109,0.24)]"
+        >
           <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
             <div className="flex flex-col gap-4 sm:max-w-xl">
               <p className="mono-label text-[#74796d]">Role</p>
-              <h2 className="display-title text-[2.5rem] sm:text-[3.4rem]">
-                Gunakan akses sesuai tugas.
+              <h2 className="display-title  text-3xl sm:text-4xl">
+                Gunakan akses sesuai tugas
               </h2>
             </div>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {roleCards.map(({ icon: Icon, title, body }) => (
-                <article
-                  key={title}
-                  className="surface-card rounded-lg p-6"
-                >
+                <article key={title} className="surface-card rounded-lg p-6">
                   <div className="inline-flex size-11 items-center justify-center rounded-2xl border border-[rgba(116,121,109,0.24)] bg-white text-[#1a1c18]">
                     <Icon className="size-5" />
                   </div>
                   <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-[#1a1c18]">
                     {title}
                   </h3>
-                  <p className="mt-2 text-sm leading-7 text-[#44483e]">{body}</p>
+                  <p className="mt-2 text-sm leading-7 text-[#44483e]">
+                    {body}
+                  </p>
                 </article>
               ))}
             </div>
@@ -211,8 +216,8 @@ export function LandingPage() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
                 <p className="mono-label text-[#74796d]">Akses Akun</p>
-                <h2 className="display-title mt-4 text-[2.3rem] sm:text-[3rem]">
-                  Masuk atau buat akun.
+                <h2 className="display-title mt-4 text-xl sm:text-2xl">
+                  Masuk atau buat akun
                 </h2>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">

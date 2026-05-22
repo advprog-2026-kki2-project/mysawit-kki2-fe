@@ -60,7 +60,7 @@ export function AuthShell({
             <div className="space-y-6">
               <Badge>{badge}</Badge>
               <div className="max-w-2xl">
-                <h1 className="display-title text-[3rem] sm:text-[4.2rem] lg:text-[5rem]">
+                <h1 className="display-title text-[3rem] lg:text-[5rem]">
                   {title}
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-7 text-[#44483e] sm:text-lg">
